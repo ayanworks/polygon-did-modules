@@ -5,14 +5,15 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  id-token: write # Needed for npm trusted publishing
+  pull-requests: write
+
 jobs:
   release:
     name: Release Stable
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-      id-token: write # Needed for npm trusted publishing
-      pull-requests: write
     outputs:
       published: ${{ env.PUBLISHED == 'true' }}
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -74,7 +75,7 @@ jobs:
 
       # Ensure npm 11.5.1 or later required by trusted publishing
       - name: Update npm
-        run: npm install -g npm@11.5.1
+        run: npm install -g npm@^11
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -87,7 +88,7 @@ jobs:
           # this ensures there's always a patch release created
           cat << 'EOF' > .changeset/snapshot-template-changeset.md
           ---
-          '@credebl/ssi-mobile-core': patch
+          '@ayanworks/polygon-did-resolver': patch
           ---
 
           snapshot release
@@ -97,7 +98,7 @@ jobs:
           pnpm build
           pnpm changeset publish --tag ${{ env.TAG }}
 
-          CURRENT_PACKAGE_VERSION=$(node -p "require('./packages/core/package.json').version")
+          CURRENT_PACKAGE_VERSION=$(node -p "require('./packages/did-resolver/package.json').version")
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag v$CURRENT_PACKAGE_VERSION

@@ -1,0 +1,26 @@
+{
+	"name": "polygon-did-modules",
+	"version": "1.0.0",
+	"description": "",
+	"scripts": {
+		"build": "pnpm -r --parallel run build",
+		"types:check": "tsc -p tsconfig.json --noEmit",
+		"style:check": "biome check --unsafe",
+		"style:fix": "biome check --write --unsafe",
+		"test": "vitest",
+		"validate": "pnpm types:check && pnpm style:check"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
+	"devDependencies": {
+		"@biomejs/biome": "catalog:",
+		"@changesets/cli": "^2.29.8",
+		"typescript": "catalog:",
+		"vitest": "catalog:"
+	},
+	"engines": {
+		"node": ">=20"
+	}
+}

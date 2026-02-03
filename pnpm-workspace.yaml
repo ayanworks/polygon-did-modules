@@ -1,0 +1,7 @@
+packages:
+  - packages/*
+
+catalog:
+  "@biomejs/biome": ^2.3.13
+  typescript: ~5.9.3
+  vitest: ^4.0.18

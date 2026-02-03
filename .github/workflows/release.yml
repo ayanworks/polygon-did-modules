@@ -13,9 +13,7 @@ permissions:
 jobs:
   release:
     name: Release Stable
-    runs-on: ubuntu-24.04
-    outputs:
-      published: ${{ env.PUBLISHED == 'true' }}
+    runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repo
@@ -51,10 +49,10 @@ jobs:
         run: echo "CURRENT_PACKAGE_VERSION=$(node -p "require('./packages/did-resolver/package.json').version")" >> $GITHUB_ENV
 
       - name: Create Github Release
-        if: env.PUBLISHED == 'true'
+        if: "startsWith(github.event.head_commit.message, 'chore(release): new version')"
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ env.PACKAGE_VERSION }}
+          tag_name: v${{ env.CURRENT_PACKAGE_VERSION }}
 
   release-unstable:
     name: Release Unstable
@@ -62,7 +60,7 @@ jobs:
     # We don't want to run release and release-unstable concurrently as NPM doesn't allow publishing packages while another version of the same package is
     # still processing. So we wait for release to finish, and the always() ensure that it will run no matter the result of release.
     needs: [release]
-    if: "always() && github.event_name == 'push' && github.ref == 'refs/heads/alpha-release' && !startsWith(github.event.head_commit.message, 'chore(release): new version')"
+    if: "always() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'ayanworks/polygon-did-modules') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.event.head_commit.message, 'chore(release): new version')))"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

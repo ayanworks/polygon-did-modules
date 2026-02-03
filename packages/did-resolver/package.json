@@ -27,11 +27,11 @@
   },
   "dependencies": {
     "@ayanworks/polygon-did-registry-contract": "catalog:",
+    "did-resolver": "catalog:",
     "ethers": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "did-resolver": "catalog:",
     "typescript": "catalog:"
   }
 }

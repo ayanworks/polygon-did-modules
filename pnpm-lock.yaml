@@ -56,6 +56,9 @@ importers:
       '@ayanworks/polygon-did-registry-contract':
         specifier: 'catalog:'
         version: 3.0.0
+      did-resolver:
+        specifier: 'catalog:'
+        version: 4.1.0
       ethers:
         specifier: 'catalog:'
         version: 6.16.0
@@ -63,9 +66,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 20.19.31
-      did-resolver:
-        specifier: 'catalog:'
-        version: 4.1.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

@@ -1,8 +1,8 @@
-const { execSync } = require("node:child_process")
+const { execSync } = require('node:child_process')
 
 const getSignedOffBy = () => {
-  const gitUserName = execSync("git config user.name").toString("utf-8").trim()
-  const gitEmail = execSync("git config user.email").toString("utf-8").trim()
+  const gitUserName = execSync('git config user.name').toString('utf-8').trim()
+  const gitEmail = execSync('git config user.email').toString('utf-8').trim()
 
   return `Signed-off-by: ${gitUserName} <${gitEmail}>`
 }

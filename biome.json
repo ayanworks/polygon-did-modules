@@ -1,73 +1,73 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
-	"vcs": {
-		"useIgnoreFile": true,
-		"clientKind": "git",
-		"enabled": true
-	},
-	"files": {
-		"maxSize": 10000000
-	},
-	"formatter": {
-		"lineWidth": 120,
-		"indentStyle": "space"
-	},
-	"javascript": {
-		"parser": {
-			"unsafeParameterDecoratorsEnabled": true
-		},
-		"formatter": {
-			"semicolons": "asNeeded",
-			"quoteStyle": "single",
-			"trailingCommas": "es5",
-			"lineWidth": 120,
-			"indentStyle": "space"
-		}
-	},
-	"json": {
-		"parser": {
-			"allowComments": true
-		}
-	},
-	"assist": { "actions": { "source": { "organizeImports": "on" } } },
-	"linter": {
-		"rules": {
-			"style": {
-				"useImportType": "off",
-				"useNodejsImportProtocol": "off",
-				"noNonNullAssertion": "error",
-				"noRestrictedImports": {
-					"level": "error",
-					"options": {
-						"paths": {
-							"packages/*": "using imports from packages/* is not allowed"
-						}
-					}
-				}
-			},
-			"correctness": {
-				"noUnusedVariables": {
-					"level": "error",
-					"fix": "safe"
-				},
-				"noUnusedFunctionParameters": "off",
-				"noUnusedImports": "error",
-				"noUndeclaredDependencies": "off",
-				"noInvalidUseBeforeDeclaration": "error"
-			},
-			"suspicious": {
-				"noConsole": "error"
-			},
-			"complexity": {
-				"noBannedTypes": "error"
-			},
-			"nursery": {},
-			"performance": {
-				"noDelete": {
-					"fix": "none",
-					"level": "error"
-				}
-			}
-		}
-	}
+  "$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
+  "vcs": {
+    "useIgnoreFile": true,
+    "clientKind": "git",
+    "enabled": true
+  },
+  "files": {
+    "maxSize": 10000000
+  },
+  "formatter": {
+    "lineWidth": 120,
+    "indentStyle": "space"
+  },
+  "javascript": {
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    },
+    "formatter": {
+      "semicolons": "asNeeded",
+      "quoteStyle": "single",
+      "trailingCommas": "es5",
+      "lineWidth": 120,
+      "indentStyle": "space"
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
+    }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "linter": {
+    "rules": {
+      "style": {
+        "useImportType": "off",
+        "useNodejsImportProtocol": "off",
+        "noNonNullAssertion": "error",
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "packages/*": "using imports from packages/* is not allowed"
+            }
+          }
+        }
+      },
+      "correctness": {
+        "noUnusedVariables": {
+          "level": "error",
+          "fix": "safe"
+        },
+        "noUnusedFunctionParameters": "off",
+        "noUnusedImports": "error",
+        "noUndeclaredDependencies": "off",
+        "noInvalidUseBeforeDeclaration": "error"
+      },
+      "suspicious": {
+        "noConsole": "error"
+      },
+      "complexity": {
+        "noBannedTypes": "error"
+      },
+      "nursery": {},
+      "performance": {
+        "noDelete": {
+          "fix": "none",
+          "level": "error"
+        }
+      }
+    }
+  }
 }

@@ -6,12 +6,12 @@
     "type": "git"
   },
   "scripts": {
-    "build": "pnpm -r --parallel run build",
+    "build": "pnpm -r run build",
     "types:check": "tsc -p tsconfig.json --noEmit",
     "style:check": "biome check --unsafe",
     "style:fix": "biome check --write --unsafe",
     "validate": "pnpm types:check && pnpm style:check",
-    "test": "vitest",
+    "test": "pnpm -r run test",
     "release": "pnpm build && pnpm changeset publish --no-git-tag",
     "changeset-version": "pnpm changeset version && pnpm style:fix"
   },

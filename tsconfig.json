@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "types": ["node", "vitest/globals"],
+    "allowJs": true
+  },
+  "include": ["tests", "packages", "tests/vitest.d.ts"],
+  "exclude": ["node_modules", "**/node_modules/**", "build", "**/build/**", ".pnpm", "**/.pnpm/**"]
+}

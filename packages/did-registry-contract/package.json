@@ -25,7 +25,7 @@
     "compile:sol": "hardhat compile",
     "build": "pnpm compile:sol && tsdown --config-loader unconfig",
     "deploy": "hardhat run scripts/deploy.ts --network amoy",
-    "test": "vitest run",
+    "test": "pnpm compile:sol && vitest run",
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {

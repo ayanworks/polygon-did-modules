@@ -2,10 +2,11 @@ packages:
   - packages/*
 
 catalog:
-  "@ayanworks/polygon-did-registry-contract": 3.0.0
+  '@ayanworks/polygon-did-registry-contract': 3.0.0
+  '@ayanworks/polygon-did-resolver': 1.0.1
 
-  "@biomejs/biome": ^2.3.13
-  "@types/node": ^20.19.25
+  '@biomejs/biome': ^2.3.13
+  '@types/node': ^20.19.25
   did-resolver: ^4.1.0
   ethers: ^6.16.0
   typescript: ~5.9.3

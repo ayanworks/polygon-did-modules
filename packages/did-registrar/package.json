@@ -1,0 +1,44 @@
+{
+  "name": "@ayanworks/polygon-did-registrar",
+  "version": "1.0.0",
+  "description": "The polygon resolver library is used for resolving DID’s in Polygon Method Space. The module is supposed to be used as an integeration to polygon library.",
+  "files": [
+    "build"
+  ],
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "types": "./build/index.d.mts",
+    "module": "./build/index.mjs",
+    "exports": {
+      ".": "./build/index.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "homepage": "https://github.com/ayanworks/polygon-did-modules/tree/main/packages/did-registrar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ayanworks/polygon-did-modules",
+    "directory": "packages/did-registrar"
+  },
+  "scripts": {
+    "build": "tsdown --config-loader unconfig",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@ayanworks/polygon-did-registry-contract": "catalog:",
+    "@ayanworks/polygon-did-resolver": "catalog:",
+    "@ethersproject/basex": "^5.8.0",
+    "@ethersproject/signing-key": "^5.8.0",
+    "@ethersproject/transactions": "^5.8.0",
+    "@ethersproject/wallet": "^5.8.0",
+    "did-resolver": "catalog:",
+    "ethers": "catalog:",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/uuid": "^11.0.0",
+    "typescript": "catalog:"
+  }
+}

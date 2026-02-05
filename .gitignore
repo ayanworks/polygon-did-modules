@@ -4,3 +4,6 @@ build
 .idea
 .DS_Store
 .pnpm-store
+artifacts
+cache
+.env

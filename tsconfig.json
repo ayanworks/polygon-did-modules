@@ -6,5 +6,15 @@
     "allowJs": true
   },
   "include": ["tests", "packages", "tests/vitest.d.ts"],
-  "exclude": ["node_modules", "**/node_modules/**", "build", "**/build/**", ".pnpm", "**/.pnpm/**"]
+  "exclude": [
+    "node_modules",
+    "**/node_modules/**",
+    "build",
+    "**/build/**",
+    ".pnpm",
+    "**/.pnpm/**",
+    "**/artifacts/**",
+    // We are adding this to exclude because the type checks will fail as the contract json is only created after compile
+    "packages/did-registry-contract/src"
+  ]
 }

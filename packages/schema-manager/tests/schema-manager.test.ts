@@ -1,6 +1,6 @@
 import { SigningKey } from 'ethers'
 import { assert, beforeAll, describe, it } from 'vitest'
-import { PolygonSchema, ResourcePayload } from '../src/schema-manager'
+import { PolygonSchema, type ResourcePayload } from '../src/schema-manager'
 import {
   fileServerAccessToken,
   fileServerUrl,

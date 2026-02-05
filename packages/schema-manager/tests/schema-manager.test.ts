@@ -96,7 +96,6 @@ describe('Schema Manager', () => {
   })
 
   describe('test estimate transaction', () => {
-
     it('should have non-empty values for transaction details', async () => {
       const transactionDetails = await polygonSchemaManager.estimateTxFee('createSchema', [
         '0x13cd23928Ae515b86592C630f56C138aE4c7B79a',

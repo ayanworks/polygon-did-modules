@@ -1,4 +1,3 @@
-
 import keccak256 from 'keccak256'
 import { parseDid } from './did'
 
@@ -9,12 +8,7 @@ import { parseDid } from './did'
  * @param name
  * @returns Returns the build schema resource Document.
  */
-export async function buildSchemaResource(
-  did: string,
-  schemaId: string,
-  name: string,
-  schema: object,
-) {
+export async function buildSchemaResource(did: string, schemaId: string, name: string, schema: object) {
   const checksum = await keccak256(String(schema)).toString('hex')
   if (!checksum) {
     throw new Error(`Error while calculating checksum!`)

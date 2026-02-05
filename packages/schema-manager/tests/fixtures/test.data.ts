@@ -1,7 +1,6 @@
 export const updateDidDocument = ''
 
-export const privateKey =
-  '3f6254328fa58202094c954d89964119830f85e2f4bfdbabb1d8bcfc008d2fdd'
+export const privateKey = '3f6254328fa58202094c954d89964119830f85e2f4bfdbabb1d8bcfc008d2fdd'
 
 export const network = 'testnet'
 
@@ -358,10 +357,8 @@ export const didRegistryAbi = [
 export const testDidDetails = {
   address: '0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
   did: 'did:polygon:testnet:0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
-  privateKey:
-    '6320c5bcc5edfb1f3324b94a67c0e69916d828d6374ddb1dfeae92c27e3098de', //test key
-  publicKeyBase58:
-    '7Lnm1Zi2K75KVgHPrHADCpfa9cLAtRRocBgLsFVLw5NRPUgoLBBv1Se8ttjx4P7fXfNS5gazJmKqohNmwEqx8VjDYfPvw',
+  privateKey: '6320c5bcc5edfb1f3324b94a67c0e69916d828d6374ddb1dfeae92c27e3098de', //test key
+  publicKeyBase58: '7Lnm1Zi2K75KVgHPrHADCpfa9cLAtRRocBgLsFVLw5NRPUgoLBBv1Se8ttjx4P7fXfNS5gazJmKqohNmwEqx8VjDYfPvw',
 }
 
 export const testContractDetails = {
@@ -430,8 +427,7 @@ export const testSchemaSample = {
 
 export const testSchemaId = '7db36918-723d-4fb9-a50a-094f21ec03d1'
 
-export const fileServerUrl =
-  'https://9756-2401-4900-1c9a-21cf-183c-5bf7-1354-aff3.ngrok-free.app'
+export const fileServerUrl = 'https://9756-2401-4900-1c9a-21cf-183c-5bf7-1354-aff3.ngrok-free.app'
 
 export const fileServerAccessToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBeWFuV29ya3MiLCJpZCI6IjdmYjRmN2I3LWQ5ZWUtNDYxOC04OTE4LWZiMmIzYzY1M2EyYiJ9.x-kHeTVqX4w19ibSAspCYgIL-JFVss8yZ0CT21QVRYM'

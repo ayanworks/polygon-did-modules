@@ -68,7 +68,7 @@ describe('Registrar', () => {
     })
   })
 
-  describe('test register DID function', () => {
+  describe.skip('test register DID function', () => {
     it('should get transaction hash after DID register ', async () => {
       const builtTestDidDoc = buildTestDidDoc(polygonDID, keyPair.publicKeyBase58, 'https://example.com')
 

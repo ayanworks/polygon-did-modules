@@ -27,21 +27,15 @@ export const resourceJson = {
 
 export const testResourceId = 'b5db4a5f-2f97-4449-a755-9af0b43119ae' // Add your test resourceId
 
-// export const testDidDetails = {
-//   address: '0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
-//   did: 'did:polygon:testnet:0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
-//   privateKey:
-//     '6320c5bcc5edfb1f3324b94a67c0e69916d828d6374ddb1dfeae92c27e3098de', //test key
-//   publicKeyBase58:
-//     '7Lnm1Zi2K75KVgHPrHADCpfa9cLAtRRocBgLsFVLw5NRPUgoLBBv1Se8ttjx4P7fXfNS5gazJmKqohNmwEqx8VjDYfPvw',
-// }
-
 export const testDidDetails = {
-  address: '0x66300E86AafafA85Edc2C8a57F4cE541e054560a',
-  privateKey: '8ac80660b63aba2450c108b9528f059949d5a354e47d2ae54ec7f02e5498805e',
-  publicKeyBase58: '7Lnm1ZsKgfZwc4rFGK6PWdau4ZqNyEAVgTFQd2B7TF2AnHGQQp5e8dmpVF6P7LsVQtYfi3YgfFUTAiY3HBWZsvcuzANpL',
-  did: 'did:polygon:testnet:0x66300E86AafafA85Edc2C8a57F4cE541e054560a'
+  address: '0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
+  did: 'did:polygon:testnet:0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
+  privateKey:
+    '6320c5bcc5edfb1f3324b94a67c0e69916d828d6374ddb1dfeae92c27e3098de', //test key
+  publicKeyBase58:
+    '7Lnm1Zi2K75KVgHPrHADCpfa9cLAtRRocBgLsFVLw5NRPUgoLBBv1Se8ttjx4P7fXfNS5gazJmKqohNmwEqx8VjDYfPvw',
 }
+
 
 export const testContractDetails = {
   contractAddress: '0xc087766218b885C6283072BA316a2Bc31B5c17db',

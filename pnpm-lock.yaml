@@ -87,9 +87,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 20.19.31
-      '@types/uuid':
-        specifier: ^11.0.0
-        version: 11.0.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -1363,10 +1360,6 @@ packages:
 
   '@types/secp256k1@4.0.7':
     resolution: {integrity: sha512-Rcvjl6vARGAKRO6jHeKMatGrvOMGrR/AR11N1x2LqintPCyDZ7NBhrh238Z2VZc7aM7KIwnFpFQ7fnfK4H/9Qw==}
-
-  '@types/uuid@11.0.0':
-    resolution: {integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==}
-    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
 
   '@vitest/expect@4.0.18':
     resolution: {integrity: sha512-8sCWUyckXXYvx4opfzVY03EOiYVxyNrHS5QxX3DAIi5dpJAAkyJezHCP77VMX4HKA2LDT/Jpfo8i2r5BE3GnQQ==}
@@ -4669,10 +4662,6 @@ snapshots:
   '@types/secp256k1@4.0.7':
     dependencies:
       '@types/node': 22.7.5
-
-  '@types/uuid@11.0.0':
-    dependencies:
-      uuid: 13.0.0
 
   '@vitest/expect@4.0.18':
     dependencies:

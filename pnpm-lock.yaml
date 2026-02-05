@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@ayanworks/polygon-did-registry-contract':
-      specifier: 3.0.0
-      version: 3.0.0
+      specifier: 4.0.0
+      version: 4.0.0
     '@biomejs/biome':
       specifier: ^2.3.13
       version: 2.3.13
@@ -85,7 +85,7 @@ importers:
     dependencies:
       '@ayanworks/polygon-did-registry-contract':
         specifier: 'catalog:'
-        version: 3.0.0
+        version: 4.0.0
       did-resolver:
         specifier: 'catalog:'
         version: 4.1.0
@@ -238,8 +238,8 @@ packages:
     resolution: {integrity: sha512-oLvsaPMTBejkkmHhjf09xTgk71mOqyr/409NKhRIL08If7AhVfUsJhVsx386uJaqNd42v9kWamQ9lFbkoC2dYw==}
     engines: {node: '>=18.0.0'}
 
-  '@ayanworks/polygon-did-registry-contract@3.0.0':
-    resolution: {integrity: sha512-RnW31nkDIMG1YzuOycxGGrJFpgTcpBwS/UZR6/wMPrsJBKBEN28k2CZImwXkbgaknyTfL7xe1u3C8NxfDvhI4Q==}
+  '@ayanworks/polygon-did-registry-contract@4.0.0':
+    resolution: {integrity: sha512-18iePYxKMa0MY7xHxBKjeL3AIaiPy9YT+WSlreVDqF4XUGGWqh4TaUtMPx89i3NprcTFiYOVVhC0KhbsitBgnA==}
 
   '@babel/generator@8.0.0-beta.4':
     resolution: {integrity: sha512-5xRfRZk6wx1BRu2XnTE8cTh2mx1ixrZ3/vpn7p/RCJpgctL6pexVVHE3eqtwlYvHhPAuOYCAlnsAyXpBdmfh5Q==}
@@ -3259,7 +3259,7 @@ snapshots:
 
   '@aws/lambda-invoke-store@0.2.3': {}
 
-  '@ayanworks/polygon-did-registry-contract@3.0.0': {}
+  '@ayanworks/polygon-did-registry-contract@4.0.0': {}
 
   '@babel/generator@8.0.0-beta.4':
     dependencies:

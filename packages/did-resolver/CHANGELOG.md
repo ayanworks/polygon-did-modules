@@ -1,5 +1,11 @@
 # @ayanworks/polygon-did-resolver
 
+## 1.0.2
+
+### Patch Changes
+
+- dd214b1: bump polygon-did-registry-contract to 4.0.0
+
 ## 1.0.1
 
 ### Patch Changes

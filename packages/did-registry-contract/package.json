@@ -1,0 +1,42 @@
+{
+  "name": "@ayanworks/polygon-did-registry-contract",
+  "version": "4.0.0",
+  "description": "Smart Contract to register DID on Polygon",
+  "files": [
+    "build"
+  ],
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "types": "./build/index.d.mts",
+    "module": "./build/index.mjs",
+    "exports": {
+      ".": "./build/index.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "homepage": "https://github.com/ayanworks/polygon-did-modules/tree/main/packages/did-registry-contract",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ayanworks/polygon-did-modules",
+    "directory": "packages/did-registry-contract"
+  },
+  "scripts": {
+    "compile:sol": "hardhat compile",
+    "build": "pnpm compile:sol && tsdown --config-loader unconfig",
+    "deploy": "hardhat run scripts/deploy.ts --network amoy",
+    "test": "pnpm compile:sol && vitest run",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-verify": "^2.0.12",
+    "@openzeppelin/hardhat-upgrades": "^3.6.0",
+    "@types/node": "catalog:",
+    "ethers": "catalog:",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

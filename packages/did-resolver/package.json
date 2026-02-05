@@ -23,6 +23,7 @@
   },
   "scripts": {
     "build": "tsdown --config-loader unconfig",
+    "test": "vitest run",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -6,17 +6,23 @@ catalog:
   '@ayanworks/polygon-did-resolver': 1.0.2
   '@biomejs/biome': ^2.3.13
   '@nomicfoundation/hardhat-ethers': ^3.0.8
-  '@openzeppelin/hardhat-upgrades': ^3.6.0
   '@nomicfoundation/hardhat-verify': ^2.0.12
+  '@openzeppelin/hardhat-upgrades': ^3.6.0
   '@types/node': ^20.19.25
   did-resolver: ^4.1.0
   ethers: ^6.16.0
   hardhat: ^2.22.0
   ts-node: ^10.9.2
   typescript: ~5.9.3
-  vitest: ^4.0.18
   uuid: ^13.0.0
+  vitest: ^4.0.18
+
+ignoredBuiltDependencies:
+  - es5-ext
 
 onlyBuiltDependencies:
+  - '@2060.io/ffi-napi'
+  - '@2060.io/ref-napi'
+  - '@openwallet-foundation/askar-nodejs'
   - keccak
   - secp256k1

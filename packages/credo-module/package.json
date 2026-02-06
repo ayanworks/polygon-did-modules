@@ -1,0 +1,47 @@
+{
+  "name": "@ayanworks/credo-polygon-w3c-module",
+  "version": "1.0.0",
+  "files": [
+    "build"
+  ],
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public",
+    "types": "./build/index.d.mts",
+    "module": "./build/index.mjs",
+    "exports": {
+      ".": "./build/index.mjs",
+      "./package.json": "./package.json"
+    }
+  },
+  "homepage": "https://github.com/ayanworks/polygon-did-modules/tree/main/packages/credo-module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ayanworks/polygon-did-modules",
+    "directory": "packages/credo-module"
+  },
+  "scripts": {
+    "build": "tsdown --config-loader unconfig",
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@credo-ts/askar": "^0.6.1",
+    "@credo-ts/core": "^0.6.1",
+    "@ayanworks/polygon-did-registrar": "2.0.0",
+    "@ayanworks/polygon-did-resolver": "catalog:",
+    "@ayanworks/polygon-schema-manager": "2.0.0",
+    "did-resolver": "catalog:",
+    "ethers": "catalog:"
+  },
+  "devDependencies": {
+    "@credo-ts/node": "^0.6.1",
+    "@credo-ts/didcomm": "^0.6.1",
+    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "reflect-metadata": "^0.2.1",
+    "rxjs": "^7.8.1",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

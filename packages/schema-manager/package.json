@@ -1,6 +1,6 @@
 {
   "name": "@ayanworks/polygon-schema-manager",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Polygon schema manager",
   "files": [
     "build"

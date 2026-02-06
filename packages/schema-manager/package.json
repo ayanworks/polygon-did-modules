@@ -1,7 +1,7 @@
 {
-  "name": "@ayanworks/polygon-did-registrar",
-  "version": "2.0.0",
-  "description": "The polygon resolver library is used for resolving DID’s in Polygon Method Space. The module is supposed to be used as an integeration to polygon library.",
+  "name": "@ayanworks/polygon-schema-manager",
+  "version": "1.0.0",
+  "description": "Polygon schema manager",
   "files": [
     "build"
   ],
@@ -15,30 +15,36 @@
       "./package.json": "./package.json"
     }
   },
-  "homepage": "https://github.com/ayanworks/polygon-did-modules/tree/main/packages/did-registrar",
+  "homepage": "https://github.com/ayanworks/polygon-did-modules/tree/main/packages/schema-manager",
   "repository": {
     "type": "git",
     "url": "https://github.com/ayanworks/polygon-did-modules",
-    "directory": "packages/did-registrar"
+    "directory": "packages/schema-manager"
   },
   "scripts": {
+    "compile:sol": "hardhat compile",
     "build": "tsdown --config-loader unconfig",
-    "test": "vitest run",
+    "deploy": "hardhat run scripts/deploy.ts --network amoy",
+    "test": "pnpm compile:sol && vitest run",
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@ayanworks/polygon-did-registry-contract": "catalog:",
     "@ayanworks/polygon-did-resolver": "catalog:",
-    "@ethersproject/basex": "^5.8.0",
-    "@ethersproject/signing-key": "^5.8.0",
-    "@ethersproject/transactions": "^5.8.0",
-    "@ethersproject/wallet": "^5.8.0",
+    "axios": "^1.6.3",
     "did-resolver": "catalog:",
     "ethers": "catalog:",
+    "keccak256": "^1.0.6",
     "uuid": "catalog:"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "catalog:",
+    "@nomicfoundation/hardhat-verify": "catalog:",
+    "@openzeppelin/hardhat-upgrades": "catalog:",
     "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "hardhat": "catalog:",
+    "ts-node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

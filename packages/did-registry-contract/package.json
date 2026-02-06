@@ -29,13 +29,13 @@
     "prepublishOnly": "pnpm run build"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^3.0.8",
-    "@nomicfoundation/hardhat-verify": "^2.0.12",
-    "@openzeppelin/hardhat-upgrades": "^3.6.0",
+    "@nomicfoundation/hardhat-ethers": "catalog:",
+    "@nomicfoundation/hardhat-verify": "catalog:",
+    "@openzeppelin/hardhat-upgrades": "catalog:",
     "@types/node": "catalog:",
     "ethers": "catalog:",
-    "hardhat": "^2.22.0",
-    "ts-node": "^10.9.2",
+    "hardhat": "catalog:",
+    "ts-node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

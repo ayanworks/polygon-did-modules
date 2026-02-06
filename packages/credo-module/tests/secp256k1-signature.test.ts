@@ -49,12 +49,12 @@ const signatureSuiteRegistry = new SignatureSuiteRegistry([
 const w3cJsonLdCredentialService = new W3cJsonLdCredentialService(
   signatureSuiteRegistry,
   new W3cCredentialsModuleConfig({
-    documentLoader: customDocumentLoader
+    documentLoader: customDocumentLoader,
   })
 )
 
 describe('Secp256k1 W3cCredentialService', () => {
-  let agent: Agent<{ askar: AskarModule; polygon: PolygonModule; dids: DidsModule; }>
+  let agent: Agent<{ askar: AskarModule; polygon: PolygonModule; dids: DidsModule }>
 
   describe('Utility methods', () => {
     describe('getVerificationMethodTypesByProofType', () => {
@@ -265,7 +265,7 @@ describe('Secp256k1 W3cCredentialService', () => {
             ...EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED,
             proof: {
               ...EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED.proof,
-              jws: EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED.proof.jws + 'a',
+              jws: `${EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED.proof.jws}a`,
             },
           },
           W3cJsonLdVerifiablePresentation

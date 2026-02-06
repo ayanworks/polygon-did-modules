@@ -1,7 +1,6 @@
 import type { DidCreateResult, DidDocument } from '@credo-ts/core'
 
 import {
-  CredoError,
   DidDocumentBuilder,
   DidDocumentService,
   getEcdsaSecp256k1VerificationKey2019,

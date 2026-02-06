@@ -10,7 +10,7 @@ export class PolygonApi {
 
   public constructor(
     @inject(AgentContext) agentContext: AgentContext,
-    @inject(PolygonLedgerService) ledgerService: PolygonLedgerService,
+    @inject(PolygonLedgerService) ledgerService: PolygonLedgerService
   ) {
     this.agentContext = agentContext
     this.ledgerService = ledgerService

@@ -1,6 +1,15 @@
 import { AskarModule, type AskarModuleConfigStoreOptions } from '@credo-ts/askar'
 import type { AgentDependencies, EmptyModuleMap, InitConfig, InjectionToken } from '@credo-ts/core'
-import { AgentConfig, AgentContext, ConsoleLogger, DependencyManager, DidsModule, Kms, LogLevel, utils } from '@credo-ts/core'
+import {
+  AgentConfig,
+  AgentContext,
+  ConsoleLogger,
+  DependencyManager,
+  DidsModule,
+  Kms,
+  LogLevel,
+  utils,
+} from '@credo-ts/core'
 import { KeyManagementApi, type KeyManagementService } from '@credo-ts/core/kms'
 import { DidCommModule, type DidCommModuleConfigOptions } from '@credo-ts/didcomm'
 import { agentDependencies, NodeInMemoryKeyManagementStorage, NodeKeyManagementService } from '@credo-ts/node'
@@ -42,15 +51,11 @@ export function getAgentOptions<
   didcommConfig?: DidCommConfig,
   extraConfig: Partial<InitConfig> = {},
   inputModules?: AgentModules,
-  {
-    requireDidcomm,
-    inMemory = true,
-  }: { requireDidcomm?: RequireDidComm; inMemory?: boolean; } = {}
+  { requireDidcomm, inMemory = true }: { requireDidcomm?: RequireDidComm; inMemory?: boolean } = {}
 ): {
   config: InitConfig
   // biome-ignore lint/complexity/noBannedTypes: no explanation
-  modules: (RequireDidComm extends true ? { didcomm: DidCommModule<DidCommConfig> } : {}) &
-  AgentModules
+  modules: (RequireDidComm extends true ? { didcomm: DidCommModule<DidCommConfig> } : {}) & AgentModules
   dependencies: AgentDependencies
   inMemory?: boolean
 } {
@@ -61,18 +66,18 @@ export function getAgentOptions<
     ...extraConfig,
   }
 
-  const m = (inputModules ?? {})
+  const m = inputModules ?? {}
 
   const _modules = {
     ...(requireDidcomm
       ? {
-        didcomm: new DidCommModule({
-          connections: {
-            autoAcceptConnections: true,
-          },
-          ...didcommConfig,
-        }),
-      }
+          didcomm: new DidCommModule({
+            connections: {
+              autoAcceptConnections: true,
+            },
+            ...didcommConfig,
+          }),
+        }
       : {}),
     ...m,
 
@@ -100,7 +105,7 @@ export function getAgentOptions<
     modules:
       // biome-ignore lint/complexity/noBannedTypes: no explanation
       _modules as unknown as (RequireDidComm extends true ? { didcomm: DidCommModule<DidCommConfig> } : {}) &
-      AgentModules,
+        AgentModules,
     dependencies: agentDependencies,
   } as const
 }

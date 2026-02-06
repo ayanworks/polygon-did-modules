@@ -327,7 +327,11 @@ const SECP256K1_V1 = {
             '@protected': true,
             id: '@id',
             type: '@type',
-            assertionMethod: { '@id': 'https://w3id.org/security#assertionMethod', '@type': '@id', '@container': '@set' },
+            assertionMethod: {
+              '@id': 'https://w3id.org/security#assertionMethod',
+              '@type': '@id',
+              '@container': '@set',
+            },
             authentication: {
               '@id': 'https://w3id.org/security#authenticationMethod',
               '@type': '@id',
@@ -389,7 +393,6 @@ export const customDocumentLoader = (agentContext: AgentContext) => {
           '@embed': '@never',
           id: url,
         },
-        // @ts-expect-error documentLoader type
         { documentLoader: loader }
       )
     }

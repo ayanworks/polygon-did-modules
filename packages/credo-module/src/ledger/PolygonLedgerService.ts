@@ -78,7 +78,7 @@ export class PolygonLedgerService {
       fileServerToken,
       schemaManagerContractAddress,
       serverUrl,
-    }: PolygonModuleConfig,
+    }: PolygonModuleConfig
   ) {
     this.rpcUrl = rpcUrl
     this.didContractAddress = didContractAddress

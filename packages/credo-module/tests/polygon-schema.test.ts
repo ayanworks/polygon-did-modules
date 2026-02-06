@@ -74,7 +74,7 @@ const _testSchema = {
 }
 
 describe('Polygon Module did resolver', () => {
-  let faberAgent: Agent<{ askar: AskarModule; polygon: PolygonModule; dids: DidsModule; }>
+  let faberAgent: Agent<{ askar: AskarModule; polygon: PolygonModule; dids: DidsModule }>
   let faberWalletId: string
   let faberWalletKey: string
 

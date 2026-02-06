@@ -38,7 +38,7 @@ describe('Test Polygon Did Utils', () => {
         id: validDid,
         verificationMethod: [
           {
-            id: validDid + '#key-1',
+            id: `${validDid}#key-1`,
             publicKeyBase58: 'asca12e3as',
             type: 'JsonWebKey2020',
             controller: validDid,

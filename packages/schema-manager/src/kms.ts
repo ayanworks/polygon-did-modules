@@ -1,17 +1,5 @@
-import type {
-  JsonRpcApiProvider,
-  Provider,
-  TransactionRequest,
-  TypedDataDomain,
-  TypedDataField,
-} from 'ethers'
-import {
-  AbstractSigner,
-  assert,
-  ethers,
-  Signature,
-  toUtf8Bytes,
-} from 'ethers'
+import type { JsonRpcApiProvider, Provider, TransactionRequest, TypedDataDomain, TypedDataField } from 'ethers'
+import { AbstractSigner, assert, ethers, Signature, toUtf8Bytes } from 'ethers'
 import type { GenericSigner } from './signer'
 import { SignerError } from './signer'
 
@@ -37,7 +25,7 @@ export class KMSSigner extends AbstractSigner<JsonRpcApiProvider> {
   async signMessage(message: string | Uint8Array): Promise<string> {
     const messageBytes = typeof message === 'string' ? toUtf8Bytes(message) : message
     const hash = ethers.hashMessage(messageBytes)
-    const signatureHex = await this.signer.sign(hash)
+    const signatureHex = await this.signer.sign(ethers.getBytes(hash))
 
     // Parse the signature and return serialized form
     const sig = Signature.from(signatureHex)
@@ -65,7 +53,7 @@ export class KMSSigner extends AbstractSigner<JsonRpcApiProvider> {
       const btx = ethers.Transaction.from(populated as ethers.TransactionLike<string>)
 
       // Sign the unsigned hash
-      const signatureHex = await this.signer.sign(btx.unsignedHash)
+      const signatureHex = await this.signer.sign(ethers.getBytes(btx.unsignedHash))
 
       // Parse the signature and assign to transaction
       btx.signature = Signature.from(signatureHex)
@@ -89,7 +77,7 @@ export class KMSSigner extends AbstractSigner<JsonRpcApiProvider> {
     value: Record<string, unknown>
   ): Promise<string> {
     const hash = ethers.TypedDataEncoder.hash(domain, types, value)
-    const signatureHex = await this.signer.sign(hash)
+    const signatureHex = await this.signer.sign(ethers.getBytes(hash))
 
     // Parse the signature and return serialized form
     const sig = Signature.from(signatureHex)

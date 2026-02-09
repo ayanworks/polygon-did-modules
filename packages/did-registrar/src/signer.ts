@@ -8,7 +8,7 @@ export interface GenericSigner {
    * @param data - The data to sign (typically transaction hash)
    * @returns Signature as hex string with 0x prefix (130 chars for secp256k1)
    */
-  sign(data: string): Promise<string>
+  sign(data: Uint8Array): Promise<string>
 }
 
 /**

@@ -4,24 +4,14 @@ import { getResolver } from '@ayanworks/polygon-did-resolver'
 import { Base58 } from '@ethersproject/basex'
 import { computePublicKey } from '@ethersproject/signing-key'
 import { Resolver } from 'did-resolver'
-import { Contract, computeAddress, JsonRpcProvider, Network, Wallet } from 'ethers'
+import { Contract, computeAddress, JsonRpcProvider, Network, SigningKey, Wallet } from 'ethers'
 import { v4 as uuidv4 } from 'uuid'
-import { KMSSigner } from './kms'
-import type { GenericSigner } from './signer'
 import { parseDid, validateDid, validateResourcePayload } from './utils'
 
 export type PolygonDidInitOptions = {
   contractAddress: string
   rpcUrl: string
-  /**
-   * Generic signer interface for signing operations.
-   * it supports external signers like KMS, HSM, etc.
-   */
-  signer: GenericSigner
-  /**
-   * Signer address to be used for transaction
-   */
-  address: string
+  signingKey: SigningKey
 }
 
 export type DidDocument = Record<string, unknown>
@@ -61,13 +51,13 @@ export class PolygonDID {
   private rpcUrl: string
   public resolver: Resolver
 
-  public constructor({ contractAddress, rpcUrl, signer, address }: PolygonDidInitOptions) {
+  public constructor({ contractAddress, rpcUrl, signingKey }: PolygonDidInitOptions) {
     this.resolver = new Resolver(getResolver())
     this.contractAddress = contractAddress
     this.rpcUrl = rpcUrl
     const provider = new JsonRpcProvider(rpcUrl)
-    const kmsSigner = new KMSSigner(provider, signer, address)
-    this.registry = new Contract(contractAddress, DidRegistryContract.abi, kmsSigner)
+    const wallet = new Wallet(signingKey, provider)
+    this.registry = new Contract(contractAddress, DidRegistryContract.abi, wallet)
   }
 
   static createKeyPair(network: string) {

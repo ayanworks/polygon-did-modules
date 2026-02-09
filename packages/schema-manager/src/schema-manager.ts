@@ -3,25 +3,15 @@ import DidRegistryContract from '@ayanworks/polygon-did-registry-contract'
 import { getResolver } from '@ayanworks/polygon-did-resolver'
 import axios from 'axios'
 import { Resolver } from 'did-resolver'
-import { Contract, JsonRpcProvider, Network } from 'ethers'
+import { Contract, JsonRpcProvider, Network, SigningKey, Wallet } from 'ethers'
 import { v4 as uuidv4 } from 'uuid'
 import SchemaRegistryAbi from './abi/SchemaRegistry.json'
-import { KMSSigner } from './kms'
-import type { GenericSigner } from './signer'
 import { buildSchemaResource, parseDid, validateDid } from './utils'
 
 export type PolygonDidInitOptions = {
   didRegistrarContractAddress: string
   rpcUrl: string
-  /**
-   * Generic signer interface for signing operations.
-   * it supports external signers like KMS, HSM, etc.
-   */
-  signer: GenericSigner
-  /**
-   * Signer address to be used for transaction
-   */
-  address: string
+  signingKey: SigningKey
   schemaManagerContractAddress: string
   serverUrl: string
   fileServerToken: string
@@ -72,18 +62,17 @@ export class PolygonSchema {
     rpcUrl,
     serverUrl,
     fileServerToken,
-    signer,
-    address,
+    signingKey,
   }: PolygonDidInitOptions) {
     this.resolver = new Resolver(getResolver())
     this.schemaManagerContractAddress = schemaManagerContractAddress
     this.rpcUrl = rpcUrl
     const provider = new JsonRpcProvider(rpcUrl)
-    const kmsSigner = new KMSSigner(provider, signer, address)
-    this.didRegistry = new Contract(didRegistrarContractAddress, DidRegistryContract.abi, kmsSigner)
+    const wallet = new Wallet(signingKey, provider)
+    this.didRegistry = new Contract(didRegistrarContractAddress, DidRegistryContract.abi, wallet)
     this.accessToken = fileServerToken
     this.fileServerUrl = serverUrl
-    this.schemaRegistry = new Contract(schemaManagerContractAddress, SchemaRegistryAbi, kmsSigner)
+    this.schemaRegistry = new Contract(schemaManagerContractAddress, SchemaRegistryAbi, wallet)
   }
 
   public async createSchema(did: string, schemaName: string, schema: object) {

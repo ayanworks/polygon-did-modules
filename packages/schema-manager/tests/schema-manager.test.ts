@@ -1,7 +1,6 @@
-import { computeAddress, SigningKey } from 'ethers'
+import { SigningKey } from 'ethers'
 import { assert, beforeAll, describe, it } from 'vitest'
 import { PolygonSchema, type ResourcePayload } from '../src/schema-manager'
-import type { GenericSigner } from '../src/signer'
 import {
   fileServerAccessToken,
   fileServerUrl,
@@ -20,26 +19,11 @@ describe('Schema Manager', () => {
   let polygonSchemaManager: PolygonSchema
 
   beforeAll(async () => {
-    // Create GenericSigner from private key
-    const signingKey = new SigningKey(testDidDetails.privateKey)
-    const address = computeAddress(signingKey.publicKey)
-
-    const signer: GenericSigner = {
-      async sign(data: Uint8Array): Promise<string> {
-        // Use the sign method from SigningKey
-        const signature = signingKey.sign(data)
-        // Convert signature components to hex string (0x + r + s + v)
-        const v = signature.v < 27 ? signature.v + 27 : signature.v
-        return signature.r + signature.s.slice(2) + v.toString(16).padStart(2, '0')
-      },
-    }
-
     polygonSchemaManager = new PolygonSchema({
       didRegistrarContractAddress: DID_REGISTRAR_CONTRACT_ADDRESS,
       schemaManagerContractAddress: SCHEMA_MANAGER_CONTRACT_ADDRESS,
       rpcUrl: NETWORK_URL,
-      signer,
-      address,
+      signingKey: new SigningKey(`0x${testDidDetails.privateKey}`),
       serverUrl: fileServerUrl,
       fileServerToken: fileServerAccessToken,
     })

@@ -267,7 +267,7 @@ export class PolygonLedgerService {
       rpcUrl: this.rpcUrl,
       contractAddress: this.didContractAddress,
       signer,
-      address: '',
+      address: userAddress,
     })
   }
 

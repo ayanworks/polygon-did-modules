@@ -12,13 +12,16 @@ import { computeAddress } from 'ethers'
 import { SECURITY_CONTEXT_SECP256k1_URL } from '../signature-suites/EcdsaSecp256k1Signature2019'
 
 /**
- * Helper to create Secp256k1PublicJwk from base64url-encoded x and y coordinates
+ * Helper to create Secp256k1PublicJwk from base64url-encoded x and y coordinates.
+ * Uses compressed SEC1 format (33 bytes: prefix 02/03 + X coordinate).
  */
 export function createSecp256k1PublicJwk(publicJwk: { x: string; y: string }): Secp256k1PublicJwk {
-  const publicKeyHex =
-    Buffer.from(publicJwk.x, 'base64url').toString('hex') + Buffer.from(publicJwk.y, 'base64url').toString('hex')
+  const xBytes = Buffer.from(publicJwk.x, 'base64url')
+  const yBytes = Buffer.from(publicJwk.y, 'base64url')
+  const prefix = yBytes[yBytes.length - 1] % 2 === 0 ? '02' : '03'
+  const compressedKeyHex = prefix + xBytes.toString('hex')
 
-  return Secp256k1PublicJwkClass.fromPublicKey(Buffer.from(publicKeyHex, 'hex'))
+  return Secp256k1PublicJwkClass.fromPublicKey(Buffer.from(compressedKeyHex, 'hex'))
 }
 
 export const polygonDidRegex = new RegExp(/^did:polygon(:testnet)?:0x[0-9a-fA-F]{40}$/)

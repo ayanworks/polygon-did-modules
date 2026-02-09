@@ -22,7 +22,7 @@ import {
   TypedArrayEncoder,
 } from '@credo-ts/core'
 import type { KmsJwkPublic } from '@credo-ts/core/kms'
-import { KeyManagementApi } from '@credo-ts/core/kms'
+import { KeyManagementApi, KeyManagementKeyNotFoundError } from '@credo-ts/core/kms'
 import { Resolver } from 'did-resolver'
 import { Wallet as EtherWallet, JsonRpcProvider, SigningKey } from 'ethers'
 import { PolygonLedgerService } from '../ledger'
@@ -56,7 +56,14 @@ export class PolygonDidRegistrar implements DidRegistrar {
     privateJwk.kid = publicKeyBase58
 
     // Check if key already exists (idempotency)
-    let publicJwk = await kmsApi.getPublicKey({ keyId: publicKeyBase58 })
+    let publicJwk
+    try {
+      publicJwk = await kmsApi.getPublicKey({ keyId: publicKeyBase58 })
+    } catch (error) {
+      if (error instanceof KeyManagementKeyNotFoundError) {
+        agentContext.config.logger.debug(`Key not found in wallet: ${error}`)
+      }
+    }
     let keyId = publicKeyBase58
 
     if (!publicJwk) {
@@ -110,7 +117,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
     try {
       // Get signing key for transaction (uses base58 key name)
       const kmsSigner = await this.getSigner(agentContext, publicKeyBase58)
-      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, fullPublicKeyHex)
+      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, wallet.address)
 
       // Create DID document with PublicJwk
       const secp256k1Jwk = createSecp256k1PublicJwk(ecPublicJwk)

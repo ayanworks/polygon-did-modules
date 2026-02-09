@@ -49,8 +49,9 @@ export class KMSSigner extends AbstractSigner<JsonRpcApiProvider> {
         }
       }
 
-      // Build the transaction
-      const btx = ethers.Transaction.from(populated as ethers.TransactionLike<string>)
+      // Build the transaction without 'from' field (unsigned transactions cannot have 'from')
+      const { from, ...txWithoutFrom } = populated
+      const btx = ethers.Transaction.from(txWithoutFrom as ethers.TransactionLike<string>)
 
       // Sign the unsigned hash
       const signatureHex = await this.signer.sign(ethers.getBytes(btx.unsignedHash))

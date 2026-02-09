@@ -36,7 +36,7 @@ describe('Registrar', () => {
     }
 
     // Create GenericSigner from private key
-    const signingKey = new SigningKey(`0x${keyPair.privateKey}`)
+    const signingKey = new SigningKey(keyPair.privateKey)
     const address = computeAddress(signingKey.publicKey)
 
     const signer: GenericSigner = {

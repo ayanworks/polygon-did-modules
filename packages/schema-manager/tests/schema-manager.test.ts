@@ -21,7 +21,7 @@ describe('Schema Manager', () => {
 
   beforeAll(async () => {
     // Create GenericSigner from private key
-    const signingKey = new SigningKey(`0x${testDidDetails.privateKey}`)
+    const signingKey = new SigningKey(testDidDetails.privateKey)
     const address = computeAddress(signingKey.publicKey)
 
     const signer: GenericSigner = {

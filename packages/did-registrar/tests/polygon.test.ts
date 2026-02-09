@@ -1,6 +1,7 @@
-import { SigningKey } from 'ethers'
+import { computeAddress, SigningKey } from 'ethers'
 import { assert, beforeAll, describe, it } from 'vitest'
 import { PolygonDID } from '../src/registrar'
+import type { GenericSigner } from '../src/signer'
 import { resourceJson, testContractDetails, testDidDetails, updateDidDocument } from './fixtures/test.data'
 import { arrayHasKeys, buildTestDidDoc } from './utils/array'
 
@@ -34,10 +35,25 @@ describe('Registrar', () => {
       polygonDID = keyPair.did
     }
 
+    // Create GenericSigner from private key
+    const signingKey = new SigningKey(keyPair.privateKey)
+    const address = computeAddress(signingKey.publicKey)
+
+    const signer: GenericSigner = {
+      async sign(data: Uint8Array): Promise<string> {
+        // Use the sign method from SigningKey
+        const signature = signingKey.sign(data)
+        // Convert signature components to hex string (0x + r + s + v)
+        const v = signature.v < 27 ? signature.v + 27 : signature.v
+        return signature.r + signature.s.slice(2) + v.toString(16).padStart(2, '0')
+      },
+    }
+
     polygonDidRegistrar = new PolygonDID({
       contractAddress: CONTRACT_ADDRESS,
       rpcUrl: NETWORK_URL,
-      signingKey: new SigningKey(`0x${keyPair.privateKey}`),
+      signer,
+      address,
     })
     await new Promise((r) => setTimeout(r, 5000))
   })

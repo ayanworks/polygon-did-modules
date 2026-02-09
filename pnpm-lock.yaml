@@ -84,14 +84,14 @@ importers:
   packages/credo-module:
     dependencies:
       '@ayanworks/polygon-did-registrar':
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 2.1.0
+        version: 2.1.0
       '@ayanworks/polygon-did-resolver':
         specifier: 'catalog:'
         version: 1.0.2
       '@ayanworks/polygon-schema-manager':
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 2.1.0
+        version: 2.1.0
       '@credo-ts/askar':
         specifier: ^0.6.1
         version: 0.6.2(@openwallet-foundation/askar-shared@0.4.3)(typescript@5.9.3)
@@ -421,8 +421,8 @@ packages:
     resolution: {integrity: sha512-oLvsaPMTBejkkmHhjf09xTgk71mOqyr/409NKhRIL08If7AhVfUsJhVsx386uJaqNd42v9kWamQ9lFbkoC2dYw==}
     engines: {node: '>=18.0.0'}
 
-  '@ayanworks/polygon-did-registrar@2.0.0':
-    resolution: {integrity: sha512-uEjV6W2t6khQd1aFxo1t3vhfAwG142u23hxcLgRQNDQX4dtgMZP4NkzgDoutJCCXBhLftKb+KXZIot1I7nPQeQ==}
+  '@ayanworks/polygon-did-registrar@2.1.0':
+    resolution: {integrity: sha512-B46ygep92vBTnQ0Zsl2UlrX/9KdrIiW2cH3o9aYFhubk4EGOLYjYPzi7dVBUdpx+iOMx8StmHbKeeeVl4FLgLg==}
 
   '@ayanworks/polygon-did-registry-contract@4.0.0':
     resolution: {integrity: sha512-18iePYxKMa0MY7xHxBKjeL3AIaiPy9YT+WSlreVDqF4XUGGWqh4TaUtMPx89i3NprcTFiYOVVhC0KhbsitBgnA==}
@@ -430,8 +430,8 @@ packages:
   '@ayanworks/polygon-did-resolver@1.0.2':
     resolution: {integrity: sha512-y4irODbWS96W5zk/+M22bD0qjRBDaCbU7D6W37/132BZJdcXEUPmLD4tMNUQ8wFmc1aPION+EMrqUPOyCos+kw==}
 
-  '@ayanworks/polygon-schema-manager@2.0.0':
-    resolution: {integrity: sha512-mokJjkoaGMw9Zf3qZJOdJUlKxAj7u3NrrbmD5Z8pNEkJlo1B2rYf8RluKl6A3N79LyvSAUxyt0dPW7XXT6n5aw==}
+  '@ayanworks/polygon-schema-manager@2.1.0':
+    resolution: {integrity: sha512-OlurNyeKujqlX6fQR5RQZdHuQlG5T7OtkQxOYfBRx9Pe/K/6/gSbEMxqDvmeaQpAZwaIpxrSB0HqLKcbv1LSpw==}
 
   '@babel/generator@8.0.0-beta.4':
     resolution: {integrity: sha512-5xRfRZk6wx1BRu2XnTE8cTh2mx1ixrZ3/vpn7p/RCJpgctL6pexVVHE3eqtwlYvHhPAuOYCAlnsAyXpBdmfh5Q==}
@@ -4265,7 +4265,7 @@ snapshots:
 
   '@aws/lambda-invoke-store@0.2.3': {}
 
-  '@ayanworks/polygon-did-registrar@2.0.0':
+  '@ayanworks/polygon-did-registrar@2.1.0':
     dependencies:
       '@ayanworks/polygon-did-registry-contract': 4.0.0
       '@ayanworks/polygon-did-resolver': 1.0.2
@@ -4291,7 +4291,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@ayanworks/polygon-schema-manager@2.0.0':
+  '@ayanworks/polygon-schema-manager@2.1.0':
     dependencies:
       '@ayanworks/polygon-did-registry-contract': 4.0.0
       '@ayanworks/polygon-did-resolver': 1.0.2

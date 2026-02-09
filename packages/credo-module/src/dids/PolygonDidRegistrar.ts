@@ -44,7 +44,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
 
     // Calculate base58 public key for kid
     const signingKey = new SigningKey(privateKey)
-    const publicKeyHex = signingKey.publicKey.substring(2) // Remove '0x' prefix
+    const publicKeyHex = signingKey.compressedPublicKey.substring(2) // Remove '0x' prefix
     const publicKeyBuffer = Buffer.from(publicKeyHex, 'hex')
     const publicKeyBase58 = TypedArrayEncoder.toBase58(publicKeyBuffer)
 
@@ -109,8 +109,8 @@ export class PolygonDidRegistrar implements DidRegistrar {
 
     try {
       // Get signing key for transaction (uses base58 key name)
-      const signingKeyForTx = await this.getSigningKey(agentContext, publicKeyBase58)
-      const didRegistry = ledgerService.createDidRegistryInstance(signingKeyForTx)
+      const kmsSigner = await this.getSigner(agentContext, publicKeyBase58)
+      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, fullPublicKeyHex)
 
       // Create DID document with PublicJwk
       const secp256k1Jwk = createSecp256k1PublicJwk(ecPublicJwk)
@@ -236,15 +236,19 @@ export class PolygonDidRegistrar implements DidRegistrar {
         }
       }
 
-      const publicKeyBase58 = await this.getPublicKeyFromDid(agentContext, options.did)
+      const publicKey = await this.getPublicKeyBase58AndAddressFromDid(agentContext, options.did)
 
-      if (!publicKeyBase58) {
+      if (!publicKey || !publicKey.publicKeyBase58) {
         throw new CredoError('Public Key not found in wallet')
       }
 
-      const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
+      if (!publicKey.address) {
+        throw new CredoError(`Invalid address: ${publicKey.address}`)
+      }
 
-      const didRegistry = ledgerService.createDidRegistryInstance(signingKey)
+      const kmsSigner = await this.getSigner(agentContext, publicKey.publicKeyBase58)
+
+      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, publicKey.address)
 
       const response = await didRegistry.update(didDocument.id, didDocument as any)
 
@@ -302,15 +306,19 @@ export class PolygonDidRegistrar implements DidRegistrar {
         }
       }
 
-      const publicKeyBase58 = await this.getPublicKeyFromDid(agentContext, options.did)
+      const publicKey = await this.getPublicKeyBase58AndAddressFromDid(agentContext, options.did)
 
-      if (!publicKeyBase58) {
+      if (!publicKey || !publicKey.publicKeyBase58) {
         throw new CredoError('Public Key not found in wallet')
       }
 
-      const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
+      if (!publicKey.address) {
+        throw new CredoError(`Invalid address: ${publicKey.address}`)
+      }
 
-      const didRegistry = ledgerService.createDidRegistryInstance(signingKey)
+      const kmsSigner = await this.getSigner(agentContext, publicKey.publicKeyBase58)
+
+      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, publicKey.address)
 
       const updatedDidDocument = new DidDocumentBuilder(options.did).addContext('https://www.w3.org/ns/did/v1').build()
 
@@ -350,28 +358,24 @@ export class PolygonDidRegistrar implements DidRegistrar {
     }
   }
 
-  private async getSigningKey(agentContext: AgentContext, publicKeyBase58: string): Promise<SigningKey> {
-    // Access wallet through dependencyManager since agentContext.wallet is not available in this version
-    const wallet = agentContext.dependencyManager.resolve<any>(Symbol.for('Wallet'))
+  private async getSigner(agentContext: AgentContext, publicKeyBase58: string) {
+    const kmsApi = agentContext.dependencyManager.resolve(KeyManagementApi)
 
-    if (!wallet) {
-      throw new CredoError('Wallet not available in agent context')
+    const signer = {
+      sign: async (data: Uint8Array) => {
+        const signedData = await kmsApi.sign({
+          algorithm: 'ES256K',
+          data,
+          keyId: publicKeyBase58,
+        })
+        return TypedArrayEncoder.toHex(signedData.signature)
+      },
     }
 
-    const keyEntry = await wallet.withSession(async (session: any) => await session.fetchKey({ name: publicKeyBase58 }))
-
-    if (!keyEntry) {
-      throw new CredoError(`Key not found for publicKeyBase58: ${publicKeyBase58}`)
-    }
-
-    const signingKey = new SigningKey(keyEntry.key.secretBytes)
-
-    keyEntry.key.handle.free()
-
-    return signingKey
+    return signer
   }
 
-  private async getPublicKeyFromDid(agentContext: AgentContext, did: string) {
+  private async getPublicKeyBase58AndAddressFromDid(agentContext: AgentContext, did: string) {
     const didRepository = agentContext.dependencyManager.resolve(DidRepository)
 
     const didRecord = await didRepository.findCreatedDid(agentContext, did)
@@ -385,7 +389,12 @@ export class PolygonDidRegistrar implements DidRegistrar {
 
     const publicKeyBase58 = didRecord.didDocument.verificationMethod[0].publicKeyBase58
 
-    return publicKeyBase58
+    const address = did.split(':').pop()
+
+    return {
+      publicKeyBase58,
+      address,
+    }
   }
 }
 

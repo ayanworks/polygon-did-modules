@@ -1,9 +1,16 @@
-import { PolygonDID } from '@ayanworks/polygon-did-registrar'
+import { type GenericSigner, PolygonDID } from '@ayanworks/polygon-did-registrar'
 import { PolygonSchema } from '@ayanworks/polygon-schema-manager'
 import type { AgentContext, DidDocument } from '@credo-ts/core'
-import { CredoError, DidDocumentBuilder, DidRepository, inject, injectable, utils } from '@credo-ts/core'
-import { SigningKey } from 'ethers'
-
+import {
+  CredoError,
+  DidDocumentBuilder,
+  DidRepository,
+  inject,
+  injectable,
+  TypedArrayEncoder,
+  utils,
+} from '@credo-ts/core'
+import { KeyManagementApi } from '@credo-ts/core/kms'
 import { PolygonModuleConfig } from '../PolygonModuleConfig'
 import { generateSecp256k1KeyPair, getSecp256k1DidDocWithPublicKey } from '../utils'
 
@@ -91,15 +98,19 @@ export class PolygonLedgerService {
     agentContext: AgentContext,
     { did, schemaName, schema }: { did: string; schemaName: string; schema: object }
   ) {
-    const publicKeyBase58 = await this.getPublicKeyFromDid(agentContext, did)
+    const publicKey = await this.getPublicKeyBase58AndAddressFromDid(agentContext, did)
 
-    if (!publicKeyBase58) {
+    if (!publicKey || !publicKey.publicKeyBase58) {
       throw new CredoError('Public Key not found in wallet')
     }
 
-    const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
+    if (!publicKey.address) {
+      throw new CredoError(`Invalid address: ${publicKey.address}`)
+    }
 
-    const schemaRegistry = this.createSchemaRegistryInstance(signingKey)
+    const kmsSigner = await this.getSigner(agentContext, publicKey.publicKeyBase58)
+
+    const schemaRegistry = this.createSchemaRegistryInstance(kmsSigner, publicKey.address)
 
     agentContext.config.logger.info(`Creating schema on ledger: ${did}`)
 
@@ -115,15 +126,19 @@ export class PolygonLedgerService {
   public async getSchemaByDidAndSchemaId(agentContext: AgentContext, did: string, schemaId: string) {
     agentContext.config.logger.info(`Getting schema from ledger: ${did} and schemaId: ${schemaId}`)
 
-    const publicKeyBase58 = await this.getPublicKeyFromDid(agentContext, did)
+    const publicKey = await this.getPublicKeyBase58AndAddressFromDid(agentContext, did)
 
-    if (!publicKeyBase58) {
+    if (!publicKey || !publicKey.publicKeyBase58) {
       throw new CredoError('Public Key not found in wallet')
     }
 
-    const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
+    if (!publicKey.address) {
+      throw new CredoError(`Invalid address: ${publicKey.address}`)
+    }
 
-    const schemaRegistry = this.createSchemaRegistryInstance(signingKey)
+    const kmsSigner = await this.getSigner(agentContext, publicKey.publicKeyBase58)
+
+    const schemaRegistry = this.createSchemaRegistryInstance(kmsSigner, publicKey.address)
 
     const response = await schemaRegistry.getSchemaById(did, schemaId)
 
@@ -138,7 +153,9 @@ export class PolygonLedgerService {
   public async estimateFeeForDidOperation(agentContext: AgentContext, options: DidOperationOptions) {
     const keyPair = await generateSecp256k1KeyPair()
 
-    const didRegistry = this.createDidRegistryInstance(new SigningKey(keyPair.privateKey))
+    const kmsSigner = await this.getSigner(agentContext, keyPair.publicKeyBase58)
+
+    const didRegistry = this.createDidRegistryInstance(kmsSigner, keyPair.address)
 
     const { operation } = options
 
@@ -192,7 +209,9 @@ export class PolygonLedgerService {
   public async estimateFeeForSchemaOperation(agentContext: AgentContext, options: SchemaOperationOptions) {
     const keyPair = await generateSecp256k1KeyPair()
 
-    const schemaRegistry = this.createSchemaRegistryInstance(new SigningKey(keyPair.privateKey))
+    const kmsSigner = await this.getSigner(agentContext, keyPair.publicKeyBase58)
+
+    const schemaRegistry = this.createSchemaRegistryInstance(kmsSigner, keyPair.address)
 
     const { operation } = options
 
@@ -239,7 +258,7 @@ export class PolygonLedgerService {
     }
   }
 
-  public createDidRegistryInstance(signingKey: SigningKey) {
+  public createDidRegistryInstance(signer: GenericSigner, userAddress: string) {
     if (!this.rpcUrl || !this.didContractAddress) {
       throw new CredoError('Ledger config not found')
     }
@@ -247,11 +266,12 @@ export class PolygonLedgerService {
     return new PolygonDID({
       rpcUrl: this.rpcUrl,
       contractAddress: this.didContractAddress,
-      signingKey,
+      signer,
+      address: '',
     })
   }
 
-  private createSchemaRegistryInstance(signingKey: SigningKey) {
+  private createSchemaRegistryInstance(signer: GenericSigner, userAddress: string) {
     if (
       !this.rpcUrl ||
       !this.schemaManagerContractAddress ||
@@ -268,32 +288,29 @@ export class PolygonLedgerService {
       schemaManagerContractAddress: this.schemaManagerContractAddress,
       fileServerToken: this.fileServerToken,
       serverUrl: this.fileServerUrl,
-      signingKey,
+      address: userAddress,
+      signer,
     })
   }
 
-  private async getSigningKey(agentContext: AgentContext, publicKeyBase58: string): Promise<SigningKey> {
-    // Access wallet through dependencyManager
-    const wallet = agentContext.dependencyManager.resolve<any>(Symbol.for('Wallet'))
+  private async getSigner(agentContext: AgentContext, publicKeyBase58: string) {
+    const kmsApi = agentContext.dependencyManager.resolve(KeyManagementApi)
 
-    if (!wallet) {
-      throw new CredoError('Wallet not available in agent context')
+    const signer = {
+      sign: async (data: Uint8Array) => {
+        const signedData = await kmsApi.sign({
+          algorithm: 'ES256K',
+          data,
+          keyId: publicKeyBase58,
+        })
+        return TypedArrayEncoder.toHex(signedData.signature)
+      },
     }
 
-    const keyEntry = await wallet.withSession(async (session: any) => await session.fetchKey({ name: publicKeyBase58 }))
-
-    if (!keyEntry) {
-      throw new CredoError(`Key not found for publicKeyBase58: ${publicKeyBase58}`)
-    }
-
-    const signingKey = new SigningKey(keyEntry.key.secretBytes)
-
-    keyEntry.key.handle.free()
-
-    return signingKey
+    return signer
   }
 
-  private async getPublicKeyFromDid(agentContext: AgentContext, did: string) {
+  private async getPublicKeyBase58AndAddressFromDid(agentContext: AgentContext, did: string) {
     const didRepository = agentContext.dependencyManager.resolve(DidRepository)
 
     const didRecord = await didRepository.findCreatedDid(agentContext, did)
@@ -307,7 +324,9 @@ export class PolygonLedgerService {
 
     const publicKeyBase58 = didRecord.didDocument.verificationMethod[0].publicKeyBase58
 
-    return publicKeyBase58
+    const address = did.split(':').pop()
+
+    return { publicKeyBase58, address }
   }
 
   public updateModuleConfig({

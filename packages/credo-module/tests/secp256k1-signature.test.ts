@@ -1,3 +1,4 @@
+import '@openwallet-foundation/askar-nodejs'
 import { AskarModule, transformPrivateKeyToPrivateJwk } from '@credo-ts/askar'
 import {
   Agent,
@@ -78,7 +79,13 @@ describe('Secp256k1 W3cCredentialService', () => {
         },
         dependencies: agentDependencies,
         modules: {
-          askar: new AskarModule({ askar, store: { id: utils.uuid(), key: utils.uuid() } }),
+          askar: new AskarModule({
+            askar,
+            store: {
+              id: utils.uuid(),
+              key: utils.uuid(),
+            },
+          }),
           polygon: new PolygonModule({
             rpcUrl: 'https://rpc-amoy.polygon.technology',
             didContractAddress: '0xcB80F37eDD2bE3570c6C9D5B0888614E04E1e49E',
@@ -96,7 +103,7 @@ describe('Secp256k1 W3cCredentialService', () => {
       await agent.initialize()
 
       const signingKey = new SigningKey(privateKey)
-      const publicKeyHex = signingKey.publicKey.substring(2) // Remove '0x' prefix
+      const publicKeyHex = signingKey.compressedPublicKey.substring(2) // Remove '0x' prefix
       const publicKeyBuffer = Buffer.from(publicKeyHex, 'hex')
       const publicKeyBase58 = TypedArrayEncoder.toBase58(publicKeyBuffer)
 

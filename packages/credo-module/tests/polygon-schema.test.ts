@@ -112,7 +112,7 @@ describe('Polygon Module did resolver', () => {
 
     // Calculate publicKeyBase58 from private key (same as in PolygonDidRegistrar)
     const signingKey = new SigningKey(privateKey)
-    const publicKeyHex = signingKey.publicKey.substring(2) // Remove '0x' prefix
+    const publicKeyHex = signingKey.compressedPublicKey.substring(2) // Remove '0x' prefix
     const publicKeyBuffer = Buffer.from(publicKeyHex, 'hex')
     const publicKeyBase58 = TypedArrayEncoder.toBase58(publicKeyBuffer)
 

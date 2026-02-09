@@ -1,3 +1,4 @@
+import '@openwallet-foundation/askar-nodejs'
 import { AskarModule, transformPrivateKeyToPrivateJwk } from '@credo-ts/askar'
 import { Agent, ConsoleLogger, DidsModule, LogLevel, TypedArrayEncoder, utils } from '@credo-ts/core'
 import { type DidCommEncryptedMessage } from '@credo-ts/didcomm'
@@ -98,11 +99,11 @@ describe('Polygon Module did resolver', () => {
   //       endpoint: 'https://example.com',
   //     },
   //     secret: {
-  //       privateKey: TypedArrayEncoder.fromHex('89d6e6df0272c4262533f951d0550ecd9f444ec2e13479952e4cc6982febfed6'),
+  //       privateKey: TypedArrayEncoder.fromHex('9a07fb584a097defacde417daf9adaf343d3f761ff367cfa579110261d18d82d'),
   //     },
   //   })
 
-  //   console.log('createdDid', createdDid)
+  //   console.log('createdDid', JSON.stringify(createdDid))
   // })
 
   describe('PolygonDidResolver', () => {

@@ -1,22 +1,21 @@
 import { getResolver } from '@ayanworks/polygon-did-resolver'
-import { transformPrivateKeyToPrivateJwk } from '@credo-ts/askar'
-import type {
-  AgentContext,
-  DidCreateOptions,
-  DidCreateResult,
-  DidDeactivateOptions,
-  DidDeactivateResult,
-  DidRegistrar,
-  DidUpdateOptions,
-  DidUpdateResult,
-} from '@credo-ts/core'
+import { AskarStoreManager, transformPrivateKeyToPrivateJwk } from '@credo-ts/askar'
 import {
+  type AgentContext,
+  Buffer,
   CredoError,
+  type DidCreateOptions,
+  type DidCreateResult,
+  type DidDeactivateOptions,
+  type DidDeactivateResult,
   DidDocument,
   DidDocumentBuilder,
   DidDocumentRole,
   DidRecord,
+  type DidRegistrar,
   DidRepository,
+  type DidUpdateOptions,
+  type DidUpdateResult,
   getEcdsaSecp256k1VerificationKey2019,
   JsonTransformer,
   TypedArrayEncoder,
@@ -55,8 +54,8 @@ export class PolygonDidRegistrar implements DidRegistrar {
     })
     privateJwk.kid = publicKeyBase58
 
-    // Check if key already exists (idempotency)
-    let publicJwk
+    // Check if key already exists
+    let publicJwk: any
     try {
       publicJwk = await kmsApi.getPublicKey({ keyId: publicKeyBase58 })
     } catch (error) {
@@ -115,9 +114,9 @@ export class PolygonDidRegistrar implements DidRegistrar {
     agentContext.config.logger.info(`Creating DID on ledger: ${did}`)
 
     try {
-      // Get signing key for transaction (uses base58 key name)
-      const kmsSigner = await this.getSigner(agentContext, publicKeyBase58)
-      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, wallet.address)
+      const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
+
+      const didRegistry = ledgerService.createDidRegistryInstance(signingKey)
 
       // Create DID document with PublicJwk
       const secp256k1Jwk = createSecp256k1PublicJwk(ecPublicJwk)
@@ -243,19 +242,15 @@ export class PolygonDidRegistrar implements DidRegistrar {
         }
       }
 
-      const publicKey = await this.getPublicKeyBase58AndAddressFromDid(agentContext, options.did)
+      const publicKeyBase58 = await this.getPublicKeyFromDid(agentContext, options.did)
 
-      if (!publicKey || !publicKey.publicKeyBase58) {
+      if (!publicKeyBase58) {
         throw new CredoError('Public Key not found in wallet')
       }
 
-      if (!publicKey.address) {
-        throw new CredoError(`Invalid address: ${publicKey.address}`)
-      }
+      const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
 
-      const kmsSigner = await this.getSigner(agentContext, publicKey.publicKeyBase58)
-
-      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, publicKey.address)
+      const didRegistry = ledgerService.createDidRegistryInstance(signingKey)
 
       const response = await didRegistry.update(didDocument.id, didDocument as any)
 
@@ -313,19 +308,15 @@ export class PolygonDidRegistrar implements DidRegistrar {
         }
       }
 
-      const publicKey = await this.getPublicKeyBase58AndAddressFromDid(agentContext, options.did)
+      const publicKeyBase58 = await this.getPublicKeyFromDid(agentContext, options.did)
 
-      if (!publicKey || !publicKey.publicKeyBase58) {
+      if (!publicKeyBase58) {
         throw new CredoError('Public Key not found in wallet')
       }
 
-      if (!publicKey.address) {
-        throw new CredoError(`Invalid address: ${publicKey.address}`)
-      }
+      const signingKey = await this.getSigningKey(agentContext, publicKeyBase58)
 
-      const kmsSigner = await this.getSigner(agentContext, publicKey.publicKeyBase58)
-
-      const didRegistry = ledgerService.createDidRegistryInstance(kmsSigner, publicKey.address)
+      const didRegistry = ledgerService.createDidRegistryInstance(signingKey)
 
       const updatedDidDocument = new DidDocumentBuilder(options.did).addContext('https://www.w3.org/ns/did/v1').build()
 
@@ -365,24 +356,26 @@ export class PolygonDidRegistrar implements DidRegistrar {
     }
   }
 
-  private async getSigner(agentContext: AgentContext, publicKeyBase58: string) {
-    const kmsApi = agentContext.dependencyManager.resolve(KeyManagementApi)
+  private async getSigningKey(agentContext: AgentContext, publicKeyBase58: string): Promise<SigningKey> {
+    const askarStoreManager = agentContext.dependencyManager.resolve(AskarStoreManager)
 
-    const signer = {
-      sign: async (data: Uint8Array) => {
-        const signedData = await kmsApi.sign({
-          algorithm: 'ES256K',
-          data,
-          keyId: publicKeyBase58,
-        })
-        return TypedArrayEncoder.toHex(signedData.signature)
-      },
+    const keyEntry = await askarStoreManager.withSession(
+      agentContext,
+      async (session) => await session.fetchKey({ name: publicKeyBase58 })
+    )
+
+    if (!keyEntry) {
+      throw new CredoError('Key not found in wallet')
     }
 
-    return signer
+    const signingKey = new SigningKey(keyEntry.key.secretBytes)
+
+    keyEntry.key.handle.free()
+
+    return signingKey
   }
 
-  private async getPublicKeyBase58AndAddressFromDid(agentContext: AgentContext, did: string) {
+  private async getPublicKeyFromDid(agentContext: AgentContext, did: string) {
     const didRepository = agentContext.dependencyManager.resolve(DidRepository)
 
     const didRecord = await didRepository.findCreatedDid(agentContext, did)
@@ -396,12 +389,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
 
     const publicKeyBase58 = didRecord.didDocument.verificationMethod[0].publicKeyBase58
 
-    const address = did.split(':').pop()
-
-    return {
-      publicKeyBase58,
-      address,
-    }
+    return publicKeyBase58
   }
 }
 

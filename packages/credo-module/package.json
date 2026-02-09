@@ -28,9 +28,9 @@
   "dependencies": {
     "@credo-ts/askar": "^0.6.1",
     "@credo-ts/core": "^0.6.1",
-    "@ayanworks/polygon-did-registrar": "2.1.0",
+    "@ayanworks/polygon-did-registrar": "2.2.0",
     "@ayanworks/polygon-did-resolver": "catalog:",
-    "@ayanworks/polygon-schema-manager": "2.1.0",
+    "@ayanworks/polygon-schema-manager": "2.2.0",
     "did-resolver": "catalog:",
     "ethers": "catalog:"
   },

@@ -1,5 +1,11 @@
 # @ayanworks/polygon-schema-manager
 
+## 2.2.0
+
+### Minor Changes
+
+- 24e4aed: remove the signer and keep signing key as before
+
 ## 2.1.0
 
 ### Minor Changes

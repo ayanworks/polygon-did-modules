@@ -41,10 +41,8 @@ describe('Registrar', () => {
 
     const signer: GenericSigner = {
       async sign(data: Uint8Array): Promise<string> {
-        // Create a copy of the data to ensure it's a Uint8Array
-        const digest = new Uint8Array(data)
         // Use the sign method from SigningKey
-        const signature = signingKey.sign(digest)
+        const signature = signingKey.sign(data)
         // Convert signature components to hex string (0x + r + s + v)
         const v = signature.v < 27 ? signature.v + 27 : signature.v
         return signature.r + signature.s.slice(2) + v.toString(16).padStart(2, '0')

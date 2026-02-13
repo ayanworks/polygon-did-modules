@@ -31,7 +31,7 @@
   "dependencies": {
     "@ayanworks/polygon-did-registry-contract": "catalog:",
     "@ayanworks/polygon-did-resolver": "catalog:",
-    "axios": "^1.6.3",
+    "axios": "^1.13.5",
     "did-resolver": "catalog:",
     "ethers": "catalog:",
     "keccak256": "^1.0.6",

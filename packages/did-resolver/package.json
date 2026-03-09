@@ -5,6 +5,8 @@
   "files": [
     "build"
   ],
+  "main": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public",
@@ -27,7 +29,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@ayanworks/polygon-did-registry-contract": "catalog:",
+    "@ayanworks/polygon-did-registry-contract": "workspace:*",
     "did-resolver": "catalog:",
     "ethers": "catalog:"
   },

@@ -5,6 +5,8 @@
   "files": [
     "build"
   ],
+  "main": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public",

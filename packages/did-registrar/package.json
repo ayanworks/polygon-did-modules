@@ -1,10 +1,12 @@
 {
   "name": "@ayanworks/polygon-did-registrar",
   "version": "2.2.0",
-  "description": "The polygon resolver library is used for resolving DID’s in Polygon Method Space. The module is supposed to be used as an integeration to polygon library.",
+  "description": "The polygon resolver library is used for resolving DID’s in Polygon Method Space. The module is supposed to be used as an integration to polygon library.",
   "files": [
     "build"
   ],
+  "main": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public",
@@ -27,8 +29,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@ayanworks/polygon-did-registry-contract": "catalog:",
-    "@ayanworks/polygon-did-resolver": "catalog:",
+    "@ayanworks/polygon-did-registry-contract": "workspace:*",
+    "@ayanworks/polygon-did-resolver": "workspace:*",
     "@ethersproject/basex": "^5.8.0",
     "@ethersproject/signing-key": "^5.8.0",
     "@ethersproject/transactions": "^5.8.0",

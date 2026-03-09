@@ -4,6 +4,8 @@
   "files": [
     "build"
   ],
+  "main": "./build/index.mjs",
+  "types": "./build/index.d.mts",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public",
@@ -28,9 +30,9 @@
   "dependencies": {
     "@credo-ts/askar": "^0.6.1",
     "@credo-ts/core": "^0.6.1",
-    "@ayanworks/polygon-did-registrar": "2.2.0",
-    "@ayanworks/polygon-did-resolver": "catalog:",
-    "@ayanworks/polygon-schema-manager": "2.2.0",
+    "@ayanworks/polygon-did-registrar": "workspace:*",
+    "@ayanworks/polygon-did-resolver": "workspace:*",
+    "@ayanworks/polygon-schema-manager": "workspace:*",
     "did-resolver": "catalog:",
     "ethers": "catalog:"
   },

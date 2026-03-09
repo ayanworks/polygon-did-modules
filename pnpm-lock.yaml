@@ -50,18 +50,6 @@ importers:
 
   .:
     devDependencies:
-      '@ayanworks/polygon-did-registrar':
-        specifier: workspace:*
-        version: link:packages/did-registrar
-      '@ayanworks/polygon-did-registry-contract':
-        specifier: workspace:*
-        version: link:packages/did-registry-contract
-      '@ayanworks/polygon-did-resolver':
-        specifier: workspace:*
-        version: link:packages/did-resolver
-      '@ayanworks/polygon-schema-manager':
-        specifier: workspace:*
-        version: link:packages/schema-manager
       '@biomejs/biome':
         specifier: 'catalog:'
         version: 2.3.13

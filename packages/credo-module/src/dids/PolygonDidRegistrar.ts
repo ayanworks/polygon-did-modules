@@ -25,13 +25,12 @@ import { KeyManagementApi, KeyManagementKeyNotFoundError } from '@credo-ts/core/
 import { Resolver } from 'did-resolver'
 import { Wallet as EtherWallet, JsonRpcProvider, SigningKey } from 'ethers'
 import { PolygonLedgerService } from '../ledger'
-import { buildDid, createSecp256k1PublicJwk, getSecp256k1DidDoc, validateSpecCompliantPayload } from './didPolygonUtil'
 import { PolygonModuleConfig } from '../PolygonModuleConfig'
+import { buildDid, createSecp256k1PublicJwk, getSecp256k1DidDoc, validateSpecCompliantPayload } from './didPolygonUtil'
 
 export class PolygonDidRegistrar implements DidRegistrar {
   public readonly supportedMethods = ['polygon']
   private resolver?: Resolver
-
 
   /**
    * Import a private key to KMS with idempotency check
@@ -398,9 +397,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
     if (!this.resolver) {
       const polygonOptions = agentContext.dependencyManager.resolve(PolygonModuleConfig)
 
-      this.resolver = new Resolver(
-        getResolver(polygonOptions.rpcUrl, polygonOptions.didContractAddress)
-      )
+      this.resolver = new Resolver(getResolver(polygonOptions.rpcUrl, polygonOptions.didContractAddress))
     }
 
     return this.resolver

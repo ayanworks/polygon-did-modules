@@ -8,10 +8,7 @@ import { parseDid, validateDid } from './utils/did'
  * @param rpcUrl Optional override for the RPC
  * @param contractAddress Optional override for the Registry Address
  */
-export function getResolver(
-  rpcUrl?: string,
-  contractAddress?: string
-): Record<string, DIDResolver> {
+export function getResolver(rpcUrl?: string, contractAddress?: string): Record<string, DIDResolver> {
   const _rpcUrl = rpcUrl
   const _contractAddress = contractAddress
 

@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/suspicious/noConsole: <explanation> */
+/** biome-ignore-all lint/suspicious/noConsole: No explanation */
 import DidRegistryContract from '@ayanworks/polygon-did-registry-contract'
 import { getResolver, parseDid, validateDid } from '@ayanworks/polygon-did-resolver'
 import axios from 'axios'

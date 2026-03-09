@@ -7,14 +7,13 @@ import {
   JsonTransformer,
 } from '@credo-ts/core'
 import { Resolver } from 'did-resolver'
-
-import { isValidPolygonDid } from './didPolygonUtil'
 import { PolygonModuleConfig } from '../PolygonModuleConfig'
+import { isValidPolygonDid } from './didPolygonUtil'
 
 export class PolygonDidResolver implements DidResolver {
   public readonly allowsCaching = true
 
-  private resolver?: Resolver;
+  private resolver?: Resolver
 
   public readonly supportedMethods = ['polygon']
 
@@ -49,9 +48,7 @@ export class PolygonDidResolver implements DidResolver {
     if (!this.resolver) {
       const polygonOptions = agentContext.dependencyManager.resolve(PolygonModuleConfig)
 
-      this.resolver = new Resolver(
-        getResolver(polygonOptions.rpcUrl, polygonOptions.didContractAddress)
-      )
+      this.resolver = new Resolver(getResolver(polygonOptions.rpcUrl, polygonOptions.didContractAddress))
     }
 
     return this.resolver

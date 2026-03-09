@@ -1,5 +1,5 @@
-import keccak256 from 'keccak256'
 import { parseDid } from '@ayanworks/polygon-did-resolver'
+import keccak256 from 'keccak256'
 
 /**
  * Build schema JSON.

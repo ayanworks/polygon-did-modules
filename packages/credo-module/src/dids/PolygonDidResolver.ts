@@ -6,21 +6,17 @@ import {
   type DidResolver,
   JsonTransformer,
 } from '@credo-ts/core'
-import type { ResolverRegistry } from 'did-resolver'
 import { Resolver } from 'did-resolver'
 
 import { isValidPolygonDid } from './didPolygonUtil'
+import { PolygonModuleConfig } from '../PolygonModuleConfig'
 
 export class PolygonDidResolver implements DidResolver {
   public readonly allowsCaching = true
 
+  private resolver?: Resolver;
+
   public readonly supportedMethods = ['polygon']
-
-  public resolver: Resolver
-
-  public constructor() {
-    this.resolver = new Resolver(getResolver() as ResolverRegistry)
-  }
 
   public async resolve(agentContext: AgentContext, did: string): Promise<DidResolutionResult> {
     const didDocumentMetadata = {}
@@ -29,7 +25,8 @@ export class PolygonDidResolver implements DidResolver {
       throw new Error('Invalid DID')
     }
     try {
-      const { didDocument, didDocumentMetadata, didResolutionMetadata } = await this.resolver.resolve(did)
+      const resolver = this._getResolver(agentContext)
+      const { didDocument, didDocumentMetadata, didResolutionMetadata } = await resolver.resolve(did)
 
       return {
         didDocument: JsonTransformer.fromJSON(didDocument, DidDocument),
@@ -46,5 +43,17 @@ export class PolygonDidResolver implements DidResolver {
         },
       }
     }
+  }
+
+  private _getResolver(agentContext: AgentContext) {
+    if (!this.resolver) {
+      const polygonOptions = agentContext.dependencyManager.resolve(PolygonModuleConfig)
+
+      this.resolver = new Resolver(
+        getResolver(polygonOptions.rpcUrl, polygonOptions.didContractAddress)
+      )
+    }
+
+    return this.resolver
   }
 }

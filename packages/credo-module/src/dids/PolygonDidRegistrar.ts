@@ -26,10 +26,12 @@ import { Resolver } from 'did-resolver'
 import { Wallet as EtherWallet, JsonRpcProvider, SigningKey } from 'ethers'
 import { PolygonLedgerService } from '../ledger'
 import { buildDid, createSecp256k1PublicJwk, getSecp256k1DidDoc, validateSpecCompliantPayload } from './didPolygonUtil'
+import { PolygonModuleConfig } from '../PolygonModuleConfig'
 
 export class PolygonDidRegistrar implements DidRegistrar {
   public readonly supportedMethods = ['polygon']
-  private resolver = new Resolver(getResolver())
+  private resolver?: Resolver
+
 
   /**
    * Import a private key to KMS with idempotency check
@@ -175,7 +177,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
       const isValidDidDoc = validateSpecCompliantPayload(options.didDocument)
       if (options.didDocument && isValidDidDoc === null) {
         didDocument = options.didDocument
-        const resolvedDocument = await this.resolver.resolve(didDocument.id)
+        const resolvedDocument = await this._getResolver(agentContext).resolve(didDocument.id)
         didRecord = await didRepository.findCreatedDid(agentContext, didDocument.id)
         if (!resolvedDocument.didDocument || resolvedDocument.didDocumentMetadata.deactivated || !didRecord) {
           return {
@@ -294,7 +296,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
     const did = options.did
 
     try {
-      const { didDocument, didDocumentMetadata } = await this.resolver.resolve(did)
+      const { didDocument, didDocumentMetadata } = await this._getResolver(agentContext).resolve(did)
 
       const didRecord = await didRepository.findCreatedDid(agentContext, did)
       if (!didDocument || didDocumentMetadata.deactivated || !didRecord) {
@@ -390,6 +392,18 @@ export class PolygonDidRegistrar implements DidRegistrar {
     const publicKeyBase58 = didRecord.didDocument.verificationMethod[0].publicKeyBase58
 
     return publicKeyBase58
+  }
+
+  private _getResolver(agentContext: AgentContext): Resolver {
+    if (!this.resolver) {
+      const polygonOptions = agentContext.dependencyManager.resolve(PolygonModuleConfig)
+
+      this.resolver = new Resolver(
+        getResolver(polygonOptions.rpcUrl, polygonOptions.didContractAddress)
+      )
+    }
+
+    return this.resolver
   }
 }
 

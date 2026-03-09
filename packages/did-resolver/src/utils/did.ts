@@ -11,11 +11,11 @@ export function getNetworkFromDid(did: string) {
   return 'mainnet'
 }
 
-export function parseDid(did: string) {
+export function parseDid(did: string, options: { rpcUrl?: string; contractAddress?: string } = {}) {
   const network = getNetworkFromDid(did)
   const didAddress = network === 'testnet' ? did.split(':')[3] : did.split(':')[2]
-  const contractAddress = networkConfig[network].CONTRACT_ADDRESS
-  const networkUrl = networkConfig[network].URL
+  const contractAddress = options?.contractAddress ?? networkConfig[network].CONTRACT_ADDRESS
+  const networkUrl = options?.rpcUrl ?? networkConfig[network].URL
 
   return {
     network,
@@ -27,4 +27,12 @@ export function parseDid(did: string) {
 
 export function validateDid(did: string) {
   return POLYGON_DID_REGEX.test(did)
+}
+
+export function getDidFromAddress(address: string, network: string) {
+  if (network === 'testnet') {
+    return `did:polygon:testnet:${address}`
+  }
+
+  return `did:polygon:${address}`
 }

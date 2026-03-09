@@ -1,12 +1,12 @@
 /** biome-ignore-all lint/suspicious/noConsole: <explanation> */
 import DidRegistryContract from '@ayanworks/polygon-did-registry-contract'
-import { getResolver } from '@ayanworks/polygon-did-resolver'
+import { getResolver, parseDid, validateDid } from '@ayanworks/polygon-did-resolver'
 import axios from 'axios'
 import { Resolver } from 'did-resolver'
 import { Contract, JsonRpcProvider, Network, SigningKey, Wallet } from 'ethers'
 import { v4 as uuidv4 } from 'uuid'
 import SchemaRegistryAbi from './abi/SchemaRegistry.json'
-import { buildSchemaResource, parseDid, validateDid } from './utils'
+import { buildSchemaResource } from './utils'
 
 export type PolygonDidInitOptions = {
   didRegistrarContractAddress: string
@@ -64,9 +64,10 @@ export class PolygonSchema {
     fileServerToken,
     signingKey,
   }: PolygonDidInitOptions) {
-    this.resolver = new Resolver(getResolver())
     this.schemaManagerContractAddress = schemaManagerContractAddress
     this.rpcUrl = rpcUrl
+    // Hint: We only take the rpcUrl, as the address can be resolved by using default config options.
+    this.resolver = new Resolver(getResolver(rpcUrl))
     const provider = new JsonRpcProvider(rpcUrl)
     const wallet = new Wallet(signingKey, provider)
     this.didRegistry = new Contract(didRegistrarContractAddress, DidRegistryContract.abi, wallet)
@@ -93,7 +94,8 @@ export class PolygonSchema {
       if (!isValidDid) {
         throw new Error('Invalid did provided')
       }
-      const parsedDid = parseDid(did)
+      // Only passing rpcUrl
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl })
 
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {
@@ -161,7 +163,7 @@ export class PolygonSchema {
         throw new Error('invalid did provided')
       }
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl })
 
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {

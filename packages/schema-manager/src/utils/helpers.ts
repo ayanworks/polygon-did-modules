@@ -1,5 +1,5 @@
 import keccak256 from 'keccak256'
-import { parseDid } from './did'
+import { parseDid } from '@ayanworks/polygon-did-resolver'
 
 /**
  * Build schema JSON.
@@ -16,6 +16,7 @@ export async function buildSchemaResource(did: string, schemaId: string, name: s
 
   return {
     resourceURI: `${did}/resources/${schemaId}`,
+    // Hint: No need to pass the rpcUrl and contractAddress here
     resourceCollectionId: parseDid(did).didAddress,
     resourceId: `${schemaId}`,
     resourceName: `${name}`,

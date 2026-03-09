@@ -1,12 +1,12 @@
 /** biome-ignore-all lint/suspicious/noConsole: <explanation> */
 import DidRegistryContract from '@ayanworks/polygon-did-registry-contract'
-import { getResolver } from '@ayanworks/polygon-did-resolver'
+import { getResolver, parseDid, validateDid } from '@ayanworks/polygon-did-resolver'
 import { Base58 } from '@ethersproject/basex'
 import { computePublicKey } from '@ethersproject/signing-key'
 import { Resolver } from 'did-resolver'
 import { Contract, computeAddress, JsonRpcProvider, Network, SigningKey, Wallet } from 'ethers'
 import { v4 as uuidv4 } from 'uuid'
-import { parseDid, validateDid, validateResourcePayload } from './utils'
+import { validateResourcePayload } from './utils'
 
 export type PolygonDidInitOptions = {
   contractAddress: string
@@ -52,9 +52,9 @@ export class PolygonDID {
   public resolver: Resolver
 
   public constructor({ contractAddress, rpcUrl, signingKey }: PolygonDidInitOptions) {
-    this.resolver = new Resolver(getResolver())
     this.contractAddress = contractAddress
     this.rpcUrl = rpcUrl
+    this.resolver = new Resolver(getResolver(rpcUrl, contractAddress))
     const provider = new JsonRpcProvider(rpcUrl)
     const wallet = new Wallet(signingKey, provider)
     this.registry = new Contract(contractAddress, DidRegistryContract.abi, wallet)
@@ -93,7 +93,7 @@ export class PolygonDID {
         throw new Error('invalid did provided')
       }
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
       const didDetails = await this.resolver.resolve(did)
       if (didDetails.didDocument) {
         throw new Error('The DID document already registered!')
@@ -126,7 +126,7 @@ export class PolygonDID {
         throw new Error('Invalid did provided')
       }
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
 
       if (!didDoc && !JSON.parse(didDoc)) {
         throw new Error('Invalid DID has been entered!')
@@ -161,7 +161,7 @@ export class PolygonDID {
         throw new Error('Invalid did provided')
       }
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
 
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {
@@ -194,7 +194,7 @@ export class PolygonDID {
 
       validateResourcePayload(resourcePayload)
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {
         throw new Error(`The DID document for the given DID was not found!`)
@@ -231,7 +231,7 @@ export class PolygonDID {
         throw new Error('Invalid resource id!')
       }
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
 
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {
@@ -261,7 +261,7 @@ export class PolygonDID {
         throw new Error('invalid did provided')
       }
 
-      const parsedDid = parseDid(did)
+      const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
 
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {

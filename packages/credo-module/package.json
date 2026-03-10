@@ -4,8 +4,10 @@
   "files": [
     "build"
   ],
-  "main": "./build/index.mjs",
-  "types": "./build/index.d.mts",
+  "exports": {
+    "cli": "./build/index.mjs",
+    "import": "./src/index.ts"
+  },
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public",

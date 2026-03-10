@@ -22,12 +22,8 @@ export function getResolver(rpcUrl?: string, contractAddress?: string): Record<s
     // We use the overrides passed to getResolver, or fallback to parsing the DID string
     const parsedDid = parseDid(did, { rpcUrl: _rpcUrl, contractAddress: _contractAddress })
 
-    // Prioritize: 1. Passed to getResolver -> 2. Parsed from DID -> 3. Defaults
-    const activeRpc = _rpcUrl || parsedDid.networkUrl
-    const activeContract = _contractAddress || parsedDid.contractAddress
-
-    const provider = new JsonRpcProvider(activeRpc)
-    const registry = new Contract(activeContract, DidRegistryContract.abi, provider)
+    const provider = new JsonRpcProvider(parsedDid.networkUrl)
+    const registry = new Contract(parsedDid.contractAddress, DidRegistryContract.abi, provider)
 
     // Calling smart contract to get DID Document
     const didDocument = await registry.getDIDDoc(parsedDid.didAddress)

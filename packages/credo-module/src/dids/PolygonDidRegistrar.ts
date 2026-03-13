@@ -25,8 +25,8 @@ import { Resolver } from 'did-resolver'
 import { Wallet as EtherWallet, JsonRpcProvider, SigningKey } from 'ethers'
 import { PolygonLedgerService } from '../ledger'
 import { PolygonModuleConfig } from '../PolygonModuleConfig'
-import { buildDid, createSecp256k1PublicJwk, getSecp256k1DidDoc, validateSpecCompliantPayload } from './didPolygonUtil'
 import { getCompressedEcdsaSecp256k1VerificationKey2019 } from '../utils'
+import { buildDid, createSecp256k1PublicJwk, getSecp256k1DidDoc, validateSpecCompliantPayload } from './didPolygonUtil'
 
 export class PolygonDidRegistrar implements DidRegistrar {
   public readonly supportedMethods = ['polygon']

@@ -7,9 +7,8 @@ import {
   VERIFICATION_METHOD_TYPE_ECDSA_SECP256K1_VERIFICATION_KEY_2019,
   VerificationMethod,
 } from '@credo-ts/core'
-
-import { SECURITY_CONTEXT_SECP256k1_URL } from '../signature-suites'
 import type { PublicJwk, Secp256k1PublicJwk } from '@credo-ts/core/kms'
+import { SECURITY_CONTEXT_SECP256k1_URL } from '../signature-suites'
 
 export const generateSecp256k1KeyPair = async () => {
   const { privateKey, publicKeyBase58, address } = await PolygonDID.createKeyPair('testnet')

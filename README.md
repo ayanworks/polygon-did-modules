@@ -43,6 +43,3 @@ pnpm style:fix
 ```
 
 
-<div align="center">
-  <strong>Built with ❤️ by the Polygon DID community</strong>
-</div>

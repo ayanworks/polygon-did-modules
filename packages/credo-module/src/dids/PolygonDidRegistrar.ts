@@ -16,7 +16,6 @@ import {
   DidRepository,
   type DidUpdateOptions,
   type DidUpdateResult,
-  getEcdsaSecp256k1VerificationKey2019,
   JsonTransformer,
   TypedArrayEncoder,
 } from '@credo-ts/core'
@@ -26,6 +25,7 @@ import { Resolver } from 'did-resolver'
 import { Wallet as EtherWallet, JsonRpcProvider, SigningKey } from 'ethers'
 import { PolygonLedgerService } from '../ledger'
 import { PolygonModuleConfig } from '../PolygonModuleConfig'
+import { getCompressedEcdsaSecp256k1VerificationKey2019 } from '../utils'
 import { buildDid, createSecp256k1PublicJwk, getSecp256k1DidDoc, validateSpecCompliantPayload } from './didPolygonUtil'
 
 export class PolygonDidRegistrar implements DidRegistrar {
@@ -103,7 +103,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
     }
 
     // Import key to KMS with base58 keyId
-    const { publicKeyBase58, publicJwk } = await this.importKeyToKms(agentContext, privateKey)
+    const { publicKeyBase58, publicJwk, keyId } = await this.importKeyToKms(agentContext, privateKey)
 
     // Build DID from public key coordinates (we know it's EC with secp256k1)
     const ecPublicJwk = publicJwk as { x: string; y: string }
@@ -134,6 +134,12 @@ export class PolygonDidRegistrar implements DidRegistrar {
         did: didDocument.id,
         role: DidDocumentRole.Created,
         didDocument,
+        keys: [
+          {
+            kmsKeyId: keyId,
+            didDocumentRelativeKeyId: `${didDocument.id}#key-1`,
+          },
+        ],
       })
 
       agentContext.config.logger.info(`Saving DID record to wallet: ${did} and did document: ${didDocument}`)
@@ -213,7 +219,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
           const verificationMethodCount = didDocument?.verificationMethod?.length ?? 0
           const ecPublicJwk = publicJwk as { x: string; y: string }
           const secp256k1Jwk = createSecp256k1PublicJwk(ecPublicJwk)
-          const verificationMethod = getEcdsaSecp256k1VerificationKey2019({
+          const verificationMethod = getCompressedEcdsaSecp256k1VerificationKey2019({
             id: `${didDocument.id}#key-${verificationMethodCount + 1}`,
             publicJwk: secp256k1Jwk as any,
             controller: didDocument.id,

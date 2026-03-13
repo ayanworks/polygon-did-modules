@@ -3,13 +3,13 @@ import type { DidCreateResult, DidDocument } from '@credo-ts/core'
 import {
   DidDocumentBuilder,
   DidDocumentService,
-  getEcdsaSecp256k1VerificationKey2019,
   VERIFICATION_METHOD_TYPE_ECDSA_SECP256K1_VERIFICATION_KEY_2019,
 } from '@credo-ts/core'
 import type { PublicJwk, Secp256k1PublicJwk } from '@credo-ts/core/kms'
 import { Secp256k1PublicJwk as Secp256k1PublicJwkClass } from '@credo-ts/core/kms'
 import { computeAddress } from 'ethers'
 import { SECURITY_CONTEXT_SECP256k1_URL } from '../signature-suites/EcdsaSecp256k1Signature2019'
+import { getCompressedEcdsaSecp256k1VerificationKey2019 } from '../utils'
 
 /**
  * Helper to create Secp256k1PublicJwk from base64url-encoded x and y coordinates.
@@ -54,7 +54,7 @@ export function getSecp256k1DidDoc(
   publicJwk: PublicJwk<Secp256k1PublicJwk>,
   serviceEndpoint?: string
 ): DidDocument {
-  const verificationMethod = getEcdsaSecp256k1VerificationKey2019({
+  const verificationMethod = getCompressedEcdsaSecp256k1VerificationKey2019({
     id: `${did}#key-1`,
     publicJwk,
     controller: did,

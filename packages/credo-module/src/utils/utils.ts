@@ -3,10 +3,11 @@ import type { DidDocument } from '@credo-ts/core'
 import {
   DidDocumentBuilder,
   DidDocumentService,
+  TypedArrayEncoder,
   VERIFICATION_METHOD_TYPE_ECDSA_SECP256K1_VERIFICATION_KEY_2019,
   VerificationMethod,
 } from '@credo-ts/core'
-
+import type { PublicJwk, Secp256k1PublicJwk } from '@credo-ts/core/kms'
 import { SECURITY_CONTEXT_SECP256k1_URL } from '../signature-suites'
 
 export const generateSecp256k1KeyPair = async () => {
@@ -48,4 +49,24 @@ export function getSecp256k1DidDocWithPublicKey(
   didDocumentBuilder.addKeyAgreement(verificationMethod.id)
 
   return didDocumentBuilder.build()
+}
+
+/**
+ * Get a EcdsaSecp256k1VerificationKey2019 verification method with a compressed public key.
+ */
+export function getCompressedEcdsaSecp256k1VerificationKey2019({
+  publicJwk,
+  id,
+  controller,
+}: {
+  id: string
+  publicJwk: PublicJwk<Secp256k1PublicJwk>
+  controller: string
+}) {
+  return new VerificationMethod({
+    id,
+    type: VERIFICATION_METHOD_TYPE_ECDSA_SECP256K1_VERIFICATION_KEY_2019,
+    controller,
+    publicKeyBase58: TypedArrayEncoder.toBase58(publicJwk.compressedPublicKey.publicKey),
+  })
 }

@@ -14,8 +14,10 @@
     "types": "./build/index.d.mts",
     "module": "./build/index.mjs",
     "exports": {
-      "cli": "./build/index.mjs",
-      "import": "./src/index.ts",
+      ".": {
+        "require": "./build/index.mjs",
+        "import": "./build/index.d.mts"
+      },
       "./package.json": "./package.json"
     }
   },

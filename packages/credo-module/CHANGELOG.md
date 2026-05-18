@@ -1,5 +1,11 @@
 # @ayanworks/credo-polygon-w3c-module
 
+## 2.1.0
+
+### Minor Changes
+
+- 2453129: fix: exports config
+
 ## 2.0.2
 
 ### Patch Changes

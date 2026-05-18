@@ -16,11 +16,11 @@ catalog:
   vitest: ^4.0.18
 
 ignoredBuiltDependencies:
+  - esbuild
   - es5-ext
 
 onlyBuiltDependencies:
-  - '@2060.io/ffi-napi'
-  - '@2060.io/ref-napi'
   - '@openwallet-foundation/askar-nodejs'
   - keccak
   - secp256k1
+  - koffi

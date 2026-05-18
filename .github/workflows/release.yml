@@ -17,7 +17,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
 
       - uses: pnpm/action-setup@v4
 
@@ -83,7 +83,7 @@ jobs:
     needs: [release]
     if: "always() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'ayanworks/polygon-did-modules') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.event.head_commit.message, 'chore(release): new version')))"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
       - uses: pnpm/action-setup@v4
 
       - name: Setup Node.js

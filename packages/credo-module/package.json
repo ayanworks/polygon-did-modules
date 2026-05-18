@@ -14,10 +14,7 @@
     "types": "./build/index.d.mts",
     "module": "./build/index.mjs",
     "exports": {
-      ".": {
-        "require": "./build/index.mjs",
-        "import": "./build/index.d.mts"
-      },
+      ".": "./build/index.mjs",
       "./package.json": "./package.json"
     }
   },
@@ -45,7 +42,7 @@
   "devDependencies": {
     "@credo-ts/node": "^0.6.1",
     "@credo-ts/didcomm": "^0.6.1",
-    "@openwallet-foundation/askar-nodejs": "^0.4.3",
+    "@openwallet-foundation/askar-nodejs": "0.6.0",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
     "@types/node": "catalog:",

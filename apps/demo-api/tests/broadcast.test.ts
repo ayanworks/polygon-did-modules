@@ -131,6 +131,18 @@ describe('POST /broadcast', () => {
     expect(mocks.broadcastTransaction).not.toHaveBeenCalled()
   })
 
+  it('rejects a signed transaction that carries value', async () => {
+    // Defence in depth: createDID and updateDIDDoc are nonpayable, so this would
+    // revert on chain regardless. The relay should still refuse to forward value.
+    const signedTx = await buildSignedRegistryTx({ to: CONTRACT, data: CREATE_DATA, value: 1n })
+
+    const res = await request(app).post('/broadcast').send({ signedTx })
+
+    expect(res.status).toBe(500)
+    expect(res.body).toEqual({ success: false, message: 'signed transaction must not transfer value' })
+    expect(mocks.broadcastTransaction).not.toHaveBeenCalled()
+  })
+
   it('maps node rejections to a 500 error payload', async () => {
     const signedTx = await buildSignedRegistryTx({ to: CONTRACT, data: CREATE_DATA })
     mocks.broadcastTransaction.mockRejectedValue(new Error('insufficient funds for intrinsic transaction cost'))

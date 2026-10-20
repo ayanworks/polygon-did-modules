@@ -29,12 +29,13 @@ export const buildSignedRegistryTx = async (options: {
   to: string
   data: string
   privateKey?: string
+  value?: bigint
 }): Promise<string> => {
   const wallet = new Wallet(options.privateKey ?? TEST_PRIVATE_KEY)
   return wallet.signTransaction({
     to: options.to,
     data: options.data,
-    value: 0,
+    value: options.value ?? 0,
     nonce: 0,
     chainId: TEST_CHAIN_ID,
     gasLimit: 500_000,

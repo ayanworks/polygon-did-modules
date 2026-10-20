@@ -19,7 +19,20 @@ export const parseDidDocument = (value: unknown): DidDocument | undefined => {
     return undefined
   }
   if (typeof value === 'string') {
-    return JSON.parse(value) as DidDocument
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(value)
+    } catch {
+      throw new Error('didDoc is not valid JSON')
+    }
+    // A JSON scalar ('"x"', '5', 'true') parses fine but is not a document.
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('didDoc must be a JSON object')
+    }
+    return parsed as DidDocument
+  }
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('didDoc must be a JSON object')
   }
   return value as DidDocument
 }

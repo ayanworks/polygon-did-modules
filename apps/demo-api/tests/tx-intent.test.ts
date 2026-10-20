@@ -198,6 +198,41 @@ describe('POST /tx-intent', () => {
     expect(res.body.data.data).toBe(createDidCalldata(JSON_DOC_DID.slice(-42), didDoc))
   })
 
+  it('rejects a didDoc that is not valid JSON', async () => {
+    const res = await request(app)
+      .post('/tx-intent')
+      .send({ operation: 'create', did: TEST_DID, didDoc: '{not valid json' })
+
+    expect(res.status).toBe(500)
+    expect(res.body).toEqual({ success: false, message: 'didDoc is not valid JSON' })
+  })
+
+  it('rejects a JSON scalar instead of treating it as a document', async () => {
+    const scalar = await request(app)
+      .post('/tx-intent')
+      .send({ operation: 'create', did: TEST_DID, didDoc: '"a-string"' })
+    const array = await request(app).post('/tx-intent').send({ operation: 'create', did: TEST_DID, didDoc: '[1,2]' })
+
+    for (const res of [scalar, array]) {
+      expect(res.status).toBe(500)
+      expect(res.body).toEqual({ success: false, message: 'didDoc must be a JSON object' })
+    }
+  })
+
+  it('treats a doc containing __proto__ and constructor as inert data', async () => {
+    // JSON.parse keeps these as own keys and JSON.stringify re-emits them as
+    // data, so the payload reaches calldata without touching Object.prototype.
+    // Pinned so a future switch to a merge/clone cannot silently introduce it.
+    mocks.resolve.mockResolvedValue(UNRESOLVED)
+    const protoDid = 'did:polygon:testnet:0x8888888888888888888888888888888888888888'
+    const didDoc = { id: protoDid, __proto__: { polluted: true }, constructor: { polluted: true } }
+
+    const res = await request(app).post('/tx-intent').send({ operation: 'create', did: protoDid, didDoc })
+
+    expect(res.status).toBe(200)
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined()
+  })
+
   it('maps provider failures to a 500 error payload', async () => {
     mocks.resolve.mockResolvedValue(UNRESOLVED)
     mocks.getFeeData.mockRejectedValue(new Error('fee data unavailable'))

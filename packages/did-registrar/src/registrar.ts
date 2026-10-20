@@ -4,7 +4,7 @@ import { getResolver, parseDid, validateDid } from '@ayanworks/polygon-did-resol
 import { Base58 } from '@ethersproject/basex'
 import { computePublicKey } from '@ethersproject/signing-key'
 import { Resolver } from 'did-resolver'
-import { Contract, computeAddress, JsonRpcProvider, Network, SigningKey, Wallet } from 'ethers'
+import { Contract, computeAddress, getBytes, JsonRpcProvider, Network, SigningKey, Wallet } from 'ethers'
 import { v4 as uuidv4 } from 'uuid'
 import { validateResourcePayload } from './utils'
 
@@ -68,8 +68,12 @@ export class PolygonDID {
 
     const publicKey = computePublicKey(privateKey, true)
 
-    const bufferPublicKey = Buffer.from(publicKey)
-    const publicKeyBase58 = Base58.encode(bufferPublicKey)
+    // `computePublicKey` returns the 0x-prefixed hex form, so the key bytes are
+    // the hex payload - not the text. Encoding the text produces a base58 value
+    // that decodes to the 68-byte ASCII string "0x03ab...", which no verifier
+    // can use. Every consumer in this repo (the credo module, the on-chain
+    // documents) bases58-encodes the 33 bytes instead.
+    const publicKeyBase58 = Base58.encode(getBytes(publicKey))
     if (network) {
       if (network !== 'testnet' && network !== 'mainnet') {
         throw new Error('Invalid network provided')

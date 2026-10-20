@@ -40,13 +40,48 @@ What it gives you:
 - **A request log** with the exact payload, the response, and a copyable `curl` for every call, plus a
   card per endpoint where you can edit the body and send it.
 
+The page wears AYANWORKS branding - the navy surfaces and sovereign-gold accent are taken from
+[ayanworks.com](https://www.ayanworks.com), and the lockup in `public/assets/` is served from this app
+rather than hot-linked. Only the two web fonts (Inter, JetBrains Mono) are fetched from a CDN.
+
 Notes:
 
 - Nothing is persisted. Keys live only in the page and disappear on reload; the "sample" identity ships
   no key, so it can be resolved but not written to.
 - The page loads `ethers` from a CDN, so it needs network access. The API itself does not.
+- Branding assets (the logo and favicon) are bundled locally, so the page still looks right offline;
+  only the `ethers` import and the two web fonts need the network.
 - `GET /config` reports the RPC URL and registry address the instance is wired to (public information),
   which the page uses to tell you what you are actually talking to.
+
+### Hosting the playground on its own
+
+The playground is static files, so it can be hosted separately from the API - Deno Deploy, for example.
+That is useful when you want a public UI without exposing the API host, and it works because the API
+already sends permissive CORS headers.
+
+Only the UI is portable. The API itself is **not** a Deno Deploy target: it needs a real filesystem
+(`log4js` log files, Swagger UI's on-disk assets, `public/`), Node's `http` internals via Express, and
+three `workspace:*` packages that resolve by path. Keep the API on a Node host.
+
+[`deploy/server.ts`](./deploy/server.ts) is a small Deno server that serves `public/` and fills in the
+API origin:
+
+```sh
+cd apps/demo-api
+API_BASE=https://your-api-host deno deploy --project polygon-did-playground
+```
+
+`API_BASE` is written into the page's `<meta name="api-base">` tag, which `app.js` reads at startup. The
+same files therefore stay correct in both places: served locally by the API the tag is empty and requests
+are same-origin; served from the static host they go to `API_BASE`. If `API_BASE` is not set the server
+logs a warning, because the deploy would otherwise look healthy and 404 on every request.
+
+Two things to check on the API side when you split them:
+
+- CORS is on by default (`app.use(cors())`). To restrict it, set the allowed origin explicitly rather
+  than leaving it open.
+- Serve the API over HTTPS. A page on an `https://` origin cannot call an `http://` API.
 
 ## Local signing (keyless flow, recommended)
 
@@ -89,7 +124,7 @@ node apps/demo-api/keyless-demo.mjs
 ```
 
 ```js
-import { SigningKey, Wallet, encodeBase58, toUtf8Bytes } from 'ethers'
+import { SigningKey, Wallet, encodeBase58, getBytes } from 'ethers'
 
 const API = 'http://localhost:8081'
 
@@ -100,7 +135,10 @@ const did = `did:polygon:testnet:${wallet.address}`
 // Step 1 - build the DID document locally from the PUBLIC key only.
 // (Same shape that POST /create-did produces; the demo API derives the base58
 //  key the same way, so documents from both paths are interchangeable.)
-const publicKeyBase58 = encodeBase58(toUtf8Bytes(SigningKey.computePublicKey(wallet.privateKey, true)))
+// The payload is the 33 key BYTES - `getBytes` decodes the hex. Base58-encoding
+// the hex text instead produces a value that decodes to the ASCII string
+// "0x03ab..." and that no verifier can use.
+const publicKeyBase58 = encodeBase58(getBytes(SigningKey.computePublicKey(wallet.privateKey, true)))
 const didDoc = {
   '@context': ['https://w3id.org/did/v1', 'https://w3id.org/security/suites/secp256k1-2019/v1'],
   id: did,
@@ -149,6 +187,38 @@ console.log('on chain:', resolution.id === did)
 rejects the transaction and `/broadcast` answers
 `{"success":false,"message":"insufficient funds for intrinsic transaction cost"}`. Get test MATIC
 from the [Polygon Amoy faucet](https://faucet.polygon.technology/) (network *Amoy*, token *POL*).
+
+### DIDs registered with the old `publicKeyBase58`
+
+Before `@ayanworks/polygon-did-registrar` 3.0.0, `PolygonDID.createKeyPair` base58-encoded the **hex
+text** of the public key instead of its bytes. The result still looked plausible - it was just longer -
+but it decoded to the 68-byte ASCII string `"0x03ab..."` rather than the 33-byte key, so no verifier
+could use it. Any DID registered from that output carries an unusable `publicKeyBase58`.
+
+**Those DIDs cannot be re-registered** - `createDID` reverts with `DID already exist` for an address
+that already has a document. They can however be **repaired in place**, because `updateDIDDoc`
+overwrites the stored document:
+
+1. Rebuild the document with the corrected key (step 1 above).
+2. Run the keyless flow with `operation: 'update'` - `/tx-intent` -> sign locally -> `/broadcast`.
+3. Re-resolve and confirm `publicKeyBase58` decodes to 33 bytes.
+
+`updateDIDDoc` is guarded by `onlyController`, so **only the holder of the DID's private key** can
+perform this. If that key is lost the document cannot be corrected; the DID has to be replaced with a
+newly generated one.
+
+To check whether a given DID needs repair:
+
+```bash
+curl -s "$API/resolve-did/$DID" \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
+      const A="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+      const b58=JSON.parse(s).verificationMethod[0].publicKeyBase58
+      let n=0n; for (const c of b58) n=n*58n+BigInt(A.indexOf(c))
+      let h=n.toString(16); if (h.length%2) h="0"+h
+      console.log(b58, "->", h.length/2, "bytes", h.length/2===33 ? "(OK)" : "(needs repair)")
+    })'
+```
 To try register-then-update, run step 2-4 again with `operation: 'update'` and a modified `didDoc` -
 `/tx-intent` refuses `create` for an existing DID and `update` for an unknown one, mirroring the
 custodial endpoints.
@@ -180,8 +250,36 @@ See `.env.example`.
 
 ## Run
 
+One command starts everything - the REST API, Swagger UI and the playground are all served by the same
+Express app, so there is no second process and no second port.
+
 ```bash
 pnpm --filter @ayanworks/polygon-did-demo-api dev
+```
+
+Then open:
+
+| Surface | URL | What it is |
+|---------|-----|------------|
+| Playground UI | <http://localhost:8081/> | The clickable page: generate an identity, run the keyless flow, try every endpoint |
+| Swagger UI | <http://localhost:8081/index> | The API contract, generated from `swagger.json` |
+| REST API | <http://localhost:8081/> | Call it directly, e.g. `curl http://localhost:8081/config` |
+| Config | <http://localhost:8081/config> | The RPC URL and registry address this instance is wired to |
+
+Port `8081` is the default; set `PORT` to change it. Unknown paths return JSON `404`, not the HTML page -
+only `/` serves the playground.
+
+Quick check that it is up:
+
+```bash
+curl -s http://localhost:8081/config
+# {"success":true,"data":{"rpcUrl":"...","contractAddress":"0x..."}}
+```
+
+For a scripted walkthrough of the keyless flow (no browser, signs with a throwaway key):
+
+```bash
+node apps/demo-api/keyless-demo.mjs
 ```
 
 ## Test

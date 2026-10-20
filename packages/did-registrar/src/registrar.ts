@@ -118,8 +118,10 @@ export class PolygonDID {
 
   public async update(did: string, didDoc: DidDocument) {
     try {
-      if (Object?.keys(didDoc)?.length === 0) {
-        throw new Error(`Please provide valid did document!`)
+      // Guard the value before reading it: Object.keys(null) throws a TypeError
+      // rather than rejecting the input cleanly.
+      if (!didDoc || typeof didDoc !== 'object' || Object.keys(didDoc).length === 0) {
+        throw new Error('Please provide valid did document!')
       }
       const isValidDid = validateDid(did)
       if (!isValidDid) {
@@ -128,9 +130,6 @@ export class PolygonDID {
 
       const parsedDid = parseDid(did, { rpcUrl: this.rpcUrl, contractAddress: this.contractAddress })
 
-      if (!didDoc && !JSON.parse(didDoc)) {
-        throw new Error('Invalid DID has been entered!')
-      }
       const didDetails = await this.resolver.resolve(did)
       if (!didDetails.didDocument) {
         throw new Error(`The DID document for the given DID was not found!`)
@@ -188,8 +187,14 @@ export class PolygonDID {
   public async updateResource(did: string, resourceId: string, resourcePayload: ResourcePayload) {
     try {
       const isValidDid = validateDid(did)
-      if (!isValidDid && resourceId) {
-        throw new Error('Invalid DID or resourceId provided!')
+      // Each is required on its own. The old `!isValidDid && resourceId` only
+      // rejected an invalid DID when a resourceId was also present, so an
+      // invalid DID with an empty resourceId skipped validation entirely.
+      if (!isValidDid) {
+        throw new Error('Invalid DID provided!')
+      }
+      if (!resourceId) {
+        throw new Error('Invalid resourceId provided!')
       }
 
       validateResourcePayload(resourcePayload)

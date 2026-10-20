@@ -317,6 +317,7 @@ const syncOperationToChainState = (document) => {
 const runKeyless = async (signerName) => {
   const steps = ['step-intent', 'step-sign', 'step-broadcast', 'step-verify']
   resetSteps(steps)
+  hideFundingHelp()
 
   try {
     if (!state.did) throw new Error('Generate or load an identity first')
@@ -356,7 +357,33 @@ const runKeyless = async (signerName) => {
     const running = steps.map((id) => $(id)).find((element) => element.dataset.state === 'run')
     if (running) setStep(running.id, `${running.dataset.label} - ${error.message}`, 'err')
     else setStep('step-intent', error.message, 'err')
+
+    if (isFundingError(error.message)) showFundingHelp()
   }
+}
+
+/**
+ * The address that must hold gas. In the keyless flow that is whichever key
+ * signs, so the wallet address wins when a wallet did the signing.
+ */
+const signingAddress = () => state.walletAddress ?? state.did.split(':').pop() ?? ''
+
+/**
+ * A funding problem is the one broadcast failure a visitor can actually fix, so
+ * it gets an explanation and a faucet link rather than a bare error string. The
+ * message comes back as a JSON-RPC error, hence the loose match.
+ */
+const isFundingError = (message) => /insufficient funds|INSUFFICIENT_FUNDS|gas \* price|balance 0/i.test(message)
+
+const showFundingHelp = () => {
+  const address = signingAddress()
+  $('funding-address').textContent = address || 'unknown - generate an identity first'
+  $('funding-help').hidden = false
+  $('funding-help').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+}
+
+const hideFundingHelp = () => {
+  $('funding-help').hidden = true
 }
 
 const resolveWithRetry = async (did, attempts = 6, delayMs = 2500) => {
@@ -593,6 +620,17 @@ const wire = () => {
   $('run-keyless').addEventListener('click', () => runKeyless('in-browser key'))
   $('signer-wallet').addEventListener('click', () => runKeyless('wallet'))
 
+  $('copy-address').addEventListener('click', async () => {
+    await navigator.clipboard.writeText($('funding-address').textContent)
+    $('copy-address').textContent = 'Copied'
+    setTimeout(() => {
+      $('copy-address').textContent = 'Copy'
+    }, 1200)
+  })
+
+  // Re-running is the same flow, and it re-reads the nonce, so a funded address
+  // does not need a fresh intent built by hand.
+  $('retry-keyless').addEventListener('click', () => runKeyless('in-browser key'))
   $('run-resolve').addEventListener('click', async () => {
     try {
       const document = await api('GET', `/resolve-did/${encodeURI(state.did)}`)

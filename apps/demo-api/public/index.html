@@ -84,6 +84,32 @@
         <li id="step-broadcast" data-label="POST /broadcast - not started" data-state="idle">POST /broadcast - not started</li>
         <li id="step-verify" data-label="GET /resolve-did - not started" data-state="idle">GET /resolve-did - not started</li>
       </ol>
+
+      <div id="funding-help" class="funding" hidden>
+        <div class="funding-head">
+          <span class="tag warn">needs testnet POL</span>
+          <strong>This address has no funds to pay for the transaction.</strong>
+        </div>
+        <p class="hint">
+          The address that signs must hold a little <b>POL</b> on <b>Amoy</b> to cover gas. Your key never
+          leaves this page, so the server cannot top it up for you — fund it from a faucet, then run the flow again.
+        </p>
+        <div class="funding-address">
+          <span class="funding-label">Fund this address</span>
+          <code id="funding-address">-</code>
+          <button id="copy-address" class="ghost small">Copy</button>
+        </div>
+        <div class="row">
+          <a class="btn-link" id="faucet-link" href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">
+            Open the Polygon faucet ↗
+          </a>
+          <button id="retry-keyless" class="ghost small">I funded it — run again</button>
+        </div>
+        <p class="hint small">
+          Faucets give one drip per address per day and can take a minute to land. Any gas-free drip works;
+          the official one is linked above.
+        </p>
+      </div>
     </section>
 
     <section class="card">

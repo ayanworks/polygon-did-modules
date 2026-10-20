@@ -1,0 +1,252 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Polygon DID-Method Demo",
+    "description": "A NodeJs application to polygon demo",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/create-did": {
+      "post": {
+        "tags": ["Create polygon DID"],
+        "summary": "API Endpoint for create polygon DID",
+        "description": "Generates a key pair, DID and DID document locally. No transaction is sent to the chain.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Create polygon DID",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["networkType"],
+              "properties": {
+                "networkType": {
+                  "type": "string",
+                  "enum": ["testnet", "mainnet"],
+                  "example": "testnet"
+                },
+                "privateKey": {
+                  "type": "string",
+                  "description": "Optional private key to derive the DID from instead of generating a new key pair",
+                  "example": "0xd922b5e24ab1132f68d8c3a3e758d6814f71d5b1acffdffa6a19b8f8d55db507"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created polygon DID, key details and DID document"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    },
+    "/register-did": {
+      "post": {
+        "tags": ["Register polygon DID"],
+        "summary": "API Endpoint for register polygon DID",
+        "description": "Registers the DID document on the Polygon chain. When `didDoc` is omitted the document is built from the private key.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Register new polygon DID",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["did", "privateKey"],
+              "properties": {
+                "did": {
+                  "type": "string",
+                  "example": "did:polygon:testnet:0x794b781493AeD65b9ceBD680716fec257e118993"
+                },
+                "privateKey": {
+                  "type": "string",
+                  "example": "0xd922b5e24ab1132f68d8c3a3e758d6814f71d5b1acffdffa6a19b8f8d55db507"
+                },
+                "didDoc": {
+                  "type": "object",
+                  "description": "Optional DID document to register. Built from the private key when omitted."
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Registered polygon DID with transaction hash"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    },
+    "/resolve-did/{did}": {
+      "get": {
+        "tags": ["Resolve polygon DID"],
+        "summary": "API Endpoint for resolve polygon DID",
+        "description": "Resolve polygon DID",
+        "parameters": [
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "example": "did:polygon:testnet:0x138d2231e4362fc0e028576Fb2DF56904bd59C1b"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resolved DID document"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    },
+    "/update-did/{did}": {
+      "patch": {
+        "tags": ["Update polygon DID"],
+        "summary": "API Endpoint for update polygon DID",
+        "description": "Updates the DID document stored on the Polygon chain. The private key is sent in the request body - never in the URL.",
+        "parameters": [
+          {
+            "name": "did",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Private key of the DID controller and the updated DID document",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["privateKey", "didDoc"],
+              "properties": {
+                "privateKey": {
+                  "type": "string",
+                  "example": "0xd922b5e24ab1132f68d8c3a3e758d6814f71d5b1acffdffa6a19b8f8d55db507"
+                },
+                "didDoc": {
+                  "type": "object",
+                  "example": {
+                    "@context": "https://w3id.org/did/v1",
+                    "id": "did:polygon:testnet:0x794b781493AeD65b9ceBD680716fec257e118993",
+                    "verificationMethod": [
+                      {
+                        "id": "did:polygon:testnet:0x794b781493AeD65b9ceBD680716fec257e118993",
+                        "type": "EcdsaSecp256k1VerificationKey2019",
+                        "controller": [
+                          "did:polygon:testnet:0x794b781493AeD65b9ceBD680716fec257e118993",
+                          "did:polygon:0x794b781493AeD65b9ceBD680716fec257e118993"
+                        ],
+                        "publicKeyBase58": "7Lnm1ZnseKDkH1baAb1opREfAU4MPY7zCdUDSrWSm9NxNTQmy4neU9brFUYnEcyy7CwFKjD11ikyP9J8cf6zEaAKrEzzp"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated polygon DID with transaction hash"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    },
+    "/tx-intent": {
+      "post": {
+        "tags": ["Keyless signing"],
+        "summary": "API Endpoint for building an unsigned create/update transaction",
+        "description": "Keyless flow: builds the calldata, nonce, chain id, gas and fees for registering or updating a DID document. The response is an unsigned transaction that the caller signs locally (the private key never reaches the API) and submits via POST /broadcast.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Intent details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["operation", "did", "didDoc"],
+              "properties": {
+                "operation": {
+                  "type": "string",
+                  "enum": ["create", "update"],
+                  "description": "create registers a new DID document, update replaces the one stored on chain"
+                },
+                "did": {
+                  "type": "string",
+                  "example": "did:polygon:testnet:0x794b781493AeD65b9ceBD680716fec257e118993"
+                },
+                "didDoc": {
+                  "type": "object",
+                  "description": "The DID document that will be encoded in the transaction"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unsigned transaction to sign locally and submit to /broadcast"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    },
+    "/broadcast": {
+      "post": {
+        "tags": ["Keyless signing"],
+        "summary": "API Endpoint for broadcasting a locally signed transaction",
+        "description": "Relays a transaction that was signed locally (e.g. produced from a POST /tx-intent response) to the Polygon chain. The server validates that the transaction targets the DID registry contract and only accepts createDID/updateDIDDoc calls.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Signed transaction",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["signedTx"],
+              "properties": {
+                "signedTx": {
+                  "type": "string",
+                  "description": "RLP encoded, signed raw transaction"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Transaction hash of the broadcast transaction"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    }
+  }
+}

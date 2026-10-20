@@ -36,5 +36,5 @@ export const testDidDetails = {
 export const testContractDetails = {
   contractAddress: '0xc087766218b885C6283072BA316a2Bc31B5c17db',
   unitTestCaseContractAddess: '0xc087766218b885C6283072BA316a2Bc31B5c17db',
-  networkUrl: 'https://rpc-amoy.polygon.technology',
+  networkUrl: 'https://polygon-amoy-bor-rpc.publicnode.com',
 }

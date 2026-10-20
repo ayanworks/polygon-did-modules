@@ -27,11 +27,6 @@
     "vite-node": "^5.3.0",
     "vitest": "catalog:"
   },
-  "pnpm": {
-    "overrides": {
-      "vite": "npm:rolldown-vite@latest"
-    }
-  },
   "engines": {
     "node": ">=22"
   }

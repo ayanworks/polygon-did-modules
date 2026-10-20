@@ -364,7 +364,7 @@ export const testDidDetails = {
 export const testContractDetails = {
   schemaManagerContract: '0xD6f235F1159970211B3628CbC15e6c75D4Fb6e6e',
   contractAddress: '0xc087766218b885C6283072BA316a2Bc31B5c17db',
-  networkUrl: 'https://rpc-amoy.polygon.technology',
+  networkUrl: 'https://polygon-amoy-bor-rpc.publicnode.com',
 }
 
 export const testSchemaSample = {

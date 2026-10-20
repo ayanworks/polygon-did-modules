@@ -55,7 +55,9 @@ const parseDoc = () => {
 /* ------------------------------------------------------- request logging */
 
 const buildCurl = ({ method, path, body }) => {
-  const parts = [`curl -s -X ${method} '${location.origin}${path}'`]
+  // Must point at the API, not the page: when the UI is hosted separately the
+  // page's own origin would send someone to the wrong host.
+  const parts = [`curl -s -X ${method} '${API_BASE || location.origin}${path}'`]
   if (body !== undefined) {
     parts.push(`-H 'content-type: application/json' -d '${JSON.stringify(body)}'`)
   }
@@ -116,6 +118,22 @@ const resultPane = (value) => {
 
 /* ---------------------------------------------------------- http helper */
 
+/**
+ * Where the API lives. Same-origin by default, so running the server locally
+ * needs no configuration. When the page is hosted separately (for example the
+ * static UI on Deno Deploy talking to an API elsewhere) set `window.API_BASE`
+ * to the API's origin via a small inline script or a `<meta>` tag before this
+ * module loads.
+ */
+const API_BASE = (() => {
+  const configured = window.API_BASE ?? document.querySelector('meta[name="api-base"]')?.content
+  if (!configured) return ''
+  // Trailing slashes would produce '//create-did' once concatenated.
+  return String(configured).replace(/\/+$/, '')
+})()
+
+const apiUrl = (path) => `${API_BASE}${path}`
+
 const api = async (method, path, body) => {
   const options = { method, headers: {} }
   if (body !== undefined) {
@@ -125,7 +143,7 @@ const api = async (method, path, body) => {
 
   let response
   try {
-    response = await fetch(path, options)
+    response = await fetch(apiUrl(path), options)
   } catch (error) {
     appendLog({ method, path, body, error })
     throw error
@@ -388,7 +406,7 @@ const hideFundingHelp = () => {
 
 const resolveWithRetry = async (did, attempts = 6, delayMs = 2500) => {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const response = await fetch(`/resolve-did/${encodeURI(did)}`)
+    const response = await fetch(apiUrl(`/resolve-did/${encodeURI(did)}`))
     if (response.ok) {
       const document = await response.json()
       if (document?.id) return document

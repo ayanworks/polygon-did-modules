@@ -54,6 +54,35 @@ Notes:
 - `GET /config` reports the RPC URL and registry address the instance is wired to (public information),
   which the page uses to tell you what you are actually talking to.
 
+### Hosting the playground on its own
+
+The playground is static files, so it can be hosted separately from the API - Deno Deploy, for example.
+That is useful when you want a public UI without exposing the API host, and it works because the API
+already sends permissive CORS headers.
+
+Only the UI is portable. The API itself is **not** a Deno Deploy target: it needs a real filesystem
+(`log4js` log files, Swagger UI's on-disk assets, `public/`), Node's `http` internals via Express, and
+three `workspace:*` packages that resolve by path. Keep the API on a Node host.
+
+[`deploy/server.ts`](./deploy/server.ts) is a small Deno server that serves `public/` and fills in the
+API origin:
+
+```sh
+cd apps/demo-api
+API_BASE=https://your-api-host deno deploy --project polygon-did-playground
+```
+
+`API_BASE` is written into the page's `<meta name="api-base">` tag, which `app.js` reads at startup. The
+same files therefore stay correct in both places: served locally by the API the tag is empty and requests
+are same-origin; served from the static host they go to `API_BASE`. If `API_BASE` is not set the server
+logs a warning, because the deploy would otherwise look healthy and 404 on every request.
+
+Two things to check on the API side when you split them:
+
+- CORS is on by default (`app.use(cors())`). To restrict it, set the allowed origin explicitly rather
+  than leaving it open.
+- Serve the API over HTTPS. A page on an `https://` origin cannot call an `http://` API.
+
 ## Local signing (keyless flow, recommended)
 
 The custodial endpoints mirror the registrar library and are fine for local demos, but a private key

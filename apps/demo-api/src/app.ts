@@ -1,8 +1,10 @@
+import path from 'node:path'
 import cors from 'cors'
 import type { Express } from 'express'
 import express from 'express'
 import swaggerUi from 'swagger-ui-express'
 import swaggerDocument from '../swagger.json'
+import { config } from './config'
 import { Broadcast } from './routes/broadcast'
 import { CreateDid } from './routes/create-did'
 import { RegisterDid } from './routes/register-did'
@@ -34,9 +36,25 @@ class App {
 
   private config(): void {
     this.app.use('/index', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
+    // The network this instance is wired to. Public information, and it lets the
+    // playground show what a visitor is actually talking to.
+    this.app.get('/config', (_req, res) => {
+      res.status(200).json({ success: true, data: { rpcUrl: config.rpcUrl, contractAddress: config.contractAddress } })
+    })
+
     this.app.use(express.json())
     this.app.use(express.urlencoded({ extended: false }))
     this.app.use(cors())
+
+    // The playground UI, mounted after the API routes so /create-did and friends
+    // keep priority. Only the root serves the page: unknown paths stay 404s
+    // rather than turning API mistakes into an HTML response.
+    const publicDir = path.join(import.meta.dirname, '..', 'public')
+    this.app.use(express.static(publicDir))
+    this.app.get('/', (_req, res) => {
+      res.sendFile(path.join(publicDir, 'index.html'))
+    })
   }
 }
 

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Polygon DID Demo - Playground</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Polygon DID Playground</h1>
+      <p class="subtitle">Create, register, resolve and update <code>did:polygon</code> DIDs against the demo API - with or without handing over a key.</p>
+    </div>
+    <div class="topbar-actions">
+      <span id="wallet-status" class="pill">wallet: checking...</span>
+      <a class="link" href="/index" target="_blank" rel="noreferrer">Swagger ↗</a>
+      <a class="link" href="/config" target="_blank" rel="noreferrer">Config ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="identity-card">
+      <div class="card-head">
+        <h2>1. Identity</h2>
+        <p class="hint">A key pair and DID document that the rest of the page operates on. Generate one, or paste your own to reuse.</p>
+      </div>
+      <div class="row">
+        <button id="generate">Generate a new identity</button>
+        <button id="load-sample" class="ghost">Load the on-chain sample</button>
+      </div>
+      <label class="field">
+        <span>DID</span>
+        <input id="did" type="text" spellcheck="false" placeholder="did:polygon:testnet:0x...">
+      </label>
+      <label class="field">
+        <span>Private key <em>(never sent unless you pick a custodial call below)</em></span>
+        <input id="privateKey" type="password" spellcheck="false" placeholder="0x...">
+      </label>
+      <div class="row">
+        <button id="reveal" class="ghost small">Reveal key</button>
+        <button id="copy-key" class="ghost small">Copy key</button>
+      </div>
+      <div id="identity-meta" class="meta"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>2. DID document</h2>
+        <p class="hint">The document registered on chain. Edit it inline to see updates take effect.</p>
+      </div>
+      <div class="row">
+        <button id="build-doc" class="ghost small">Rebuild from the current key</button>
+        <button id="copy-doc" class="ghost small">Copy JSON</button>
+      </div>
+      <textarea id="didDoc" rows="14" spellcheck="false"></textarea>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>3. Keyless flow <span class="tag good">no key leaves the browser</span></h2>
+        <p class="hint">
+          The API builds an unsigned transaction, this page signs it locally and posts the signed transaction back.
+          The private key above <strong>never</strong> reaches the server in this flow.
+        </p>
+      </div>
+      <div class="row">
+        <label class="field inline">
+          <span>Operation</span>
+          <select id="intent-operation">
+            <option value="create">create (register a new document)</option>
+            <option value="update">update (replace the stored document)</option>
+          </select>
+        </label>
+        <button id="signer-local">Signer: in-browser key</button>
+        <button id="signer-wallet" class="ghost">Signer: wallet (MetaMask)</button>
+      </div>
+      <div class="row">
+        <button id="run-keyless" class="primary">Run keyless flow (intent → sign → broadcast)</button>
+      </div>
+      <ol id="keyless-steps" class="steps">
+        <li id="step-intent" data-label="POST /tx-intent - not started" data-state="idle">POST /tx-intent - not started</li>
+        <li id="step-sign" data-label="Sign locally - not started" data-state="idle">Sign locally - not started</li>
+        <li id="step-broadcast" data-label="POST /broadcast - not started" data-state="idle">POST /broadcast - not started</li>
+        <li id="step-verify" data-label="GET /resolve-did - not started" data-state="idle">GET /resolve-did - not started</li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>4. Resolve</h2>
+        <p class="hint">Read the document back from the chain. Works for any DID, including the sample.</p>
+      </div>
+      <div class="row">
+        <button id="run-resolve">Resolve the DID above</button>
+      </div>
+    </section>
+
+    <section class="card danger">
+      <div class="card-head">
+        <h2>5. Custodial flow <span class="tag warn">the key is sent to the API</span></h2>
+        <p class="hint">
+          These mirror the registrar library and exist for demo parity: the server signs on your behalf, so it needs the key.
+          Prefer the keyless flow above for anything real.
+        </p>
+      </div>
+      <div class="row">
+        <button id="run-register" class="warnbtn">POST /register-did</button>
+        <button id="run-update" class="warnbtn">PATCH /update-did/:did</button>
+      </div>
+      <p class="hint small">Requires the address to hold a little Amoy POL. Get some at
+        <a class="link" href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">faucet.polygon.technology ↗</a>.
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>6. All endpoints</h2>
+        <p class="hint">Every route the API exposes, with an editable request body where it applies.</p>
+      </div>
+      <div id="endpoint-list" class="endpoints"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Request log</h2>
+        <p class="hint">Every call this page makes, with the exact payload and response. Copy any of them as curl.</p>
+      </div>
+      <div class="row">
+        <button id="clear-log" class="ghost small">Clear</button>
+      </div>
+      <div id="log" class="log"></div>
+    </section>
+  </main>
+
+  <script src="./app.js" type="module"></script>
+</body>
+</html>

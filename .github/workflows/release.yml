@@ -17,12 +17,12 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
       - name: Setup NodeJS
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '22.22.1'
           cache: "pnpm"
@@ -35,7 +35,7 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           title: "chore(release): new version"
           commit: "chore(release): new version"
@@ -46,7 +46,7 @@ jobs:
 
       - name: Create Github Releases
         if: steps.changesets.outputs.published == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const publishedPackages = ${{ steps.changesets.outputs.publishedPackages }};
@@ -83,11 +83,11 @@ jobs:
     needs: [release]
     if: "always() && ((github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'ayanworks/polygon-did-modules') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.event.head_commit.message, 'chore(release): new version')))"
     steps:
-      - uses: actions/checkout@v6.0.2
-      - uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22.22.1'
           cache: pnpm

@@ -177,8 +177,8 @@ describe('Secp256k1 W3cCredentialService', () => {
         issuer: issuerDid,
       }
       const cs = { ...(credentialJson.credentialSubject as Record<string, unknown>) } as Record<string, unknown>
-      const { id: _id, ...restCs } = cs
-      credentialJson.credentialSubject = restCs
+      const { id: _omitId, ...restCs } = cs
+      credentialJson.credentialSubject = restCs as unknown
 
       const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
 

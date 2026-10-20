@@ -13,7 +13,7 @@
  * The address must hold a little Amoy MATIC for the broadcast step:
  *   https://faucet.polygon.technology/  (network: Amoy, token: POL)
  */
-import { encodeBase58, SigningKey, toUtf8Bytes, Wallet } from 'ethers'
+import { encodeBase58, getBytes, SigningKey, Wallet } from 'ethers'
 
 const API = process.env.API_URL ?? 'http://localhost:8081'
 
@@ -24,8 +24,9 @@ console.log(`did:  ${did}\nkey:  ${wallet.privateKey}   (keep it local!)`)
 
 // Step 1 - build the DID document locally from the PUBLIC key only.
 // Same shape that POST /create-did produces; the base58 derivation matches
-// the library, so documents from both paths are interchangeable.
-const publicKeyBase58 = encodeBase58(toUtf8Bytes(SigningKey.computePublicKey(wallet.privateKey, true)))
+// the library, so documents from both paths are interchangeable. The payload
+// is the 33 key bytes, not the hex text of the key.
+const publicKeyBase58 = encodeBase58(getBytes(SigningKey.computePublicKey(wallet.privateKey, true)))
 const didDoc = {
   '@context': ['https://w3id.org/did/v1', 'https://w3id.org/security/suites/secp256k1-2019/v1'],
   id: did,

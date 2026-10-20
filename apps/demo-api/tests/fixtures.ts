@@ -4,8 +4,7 @@ import { Interface, Wallet } from 'ethers'
 export const TEST_PRIVATE_KEY = '0x6320c5bcc5edfb1f3324b94a67c0e69916d828d6374ddb1dfeae92c27e3098de'
 export const TEST_ADDRESS = '0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698'
 export const TEST_DID = `did:polygon:testnet:${TEST_ADDRESS}`
-export const TEST_PUBLIC_KEY_BASE58 =
-  '7Lnm1fsBFK3CYs28pDnfQiUaxFSSaiSBLbaZesn62WEQRryi4ezgRXPSDaT2yRBDzzCFFLBeZCnCzz7J5KyFTXGyyxhMz'
+export const TEST_PUBLIC_KEY_BASE58 = '28wpkbcBRyRDHAiVmRaAPYUjTYEWpjZTH6PzmC3sfZcpx'
 export const TEST_TXN_HASH = '0x9f2c1a7e5b3d8a4f6c0e2b9d7a1f3c5e8b6d4a2f9c7e1b3d5a8f6c4e2b0d9a7f'
 
 const registryInterface = new Interface(DidRegistryContract.abi)

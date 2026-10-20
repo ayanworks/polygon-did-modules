@@ -176,9 +176,9 @@ describe('Secp256k1 W3cCredentialService', () => {
         ...EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT,
         issuer: issuerDid,
       }
-      const cs = { ...(credentialJson.credentialSubject as Record<string, unknown>) } as Record<string, unknown>
-      const { id: _omitId, ...restCs } = cs
-      credentialJson.credentialSubject = restCs as unknown
+      const cs = credentialJson.credentialSubject as Record<string, unknown>
+      const { id, ...restCs } = cs
+      credentialJson.credentialSubject = restCs
 
       const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
 

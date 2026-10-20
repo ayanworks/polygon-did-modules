@@ -29,5 +29,20 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "pnpm": {
+    "overrides": {
+      "@peculiar/asn1-asym-key": "2.11.0",
+      "@peculiar/asn1-cms": "2.11.0",
+      "@peculiar/asn1-csr": "2.11.0",
+      "@peculiar/asn1-ecc": "2.11.0",
+      "@peculiar/asn1-pfx": "2.11.0",
+      "@peculiar/asn1-pkcs8": "2.11.0",
+      "@peculiar/asn1-pkcs9": "2.11.0",
+      "@peculiar/asn1-rsa": "2.11.0",
+      "@peculiar/asn1-schema": "2.11.0",
+      "@peculiar/asn1-x509": "2.11.0",
+      "@peculiar/asn1-x509-attr": "2.11.0"
+    }
   }
 }

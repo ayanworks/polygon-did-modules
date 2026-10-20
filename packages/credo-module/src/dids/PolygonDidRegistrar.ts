@@ -2,7 +2,6 @@ import { getResolver } from '@ayanworks/polygon-did-resolver'
 import { AskarStoreManager, transformPrivateKeyToPrivateJwk } from '@credo-ts/askar'
 import {
   type AgentContext,
-  Buffer,
   CredoError,
   type DidCreateOptions,
   type DidCreateResult,
@@ -45,7 +44,7 @@ export class PolygonDidRegistrar implements DidRegistrar {
     // Calculate base58 public key for kid
     const signingKey = new SigningKey(privateKey)
     const publicKeyHex = signingKey.compressedPublicKey.substring(2) // Remove '0x' prefix
-    const publicKeyBuffer = Buffer.from(publicKeyHex, 'hex')
+    const publicKeyBuffer = TypedArrayEncoder.fromHex(publicKeyHex)
     const publicKeyBase58 = TypedArrayEncoder.toBase58(publicKeyBuffer)
 
     // Transform to JWK
@@ -107,8 +106,8 @@ export class PolygonDidRegistrar implements DidRegistrar {
 
     // Build DID from public key coordinates (we know it's EC with secp256k1)
     const ecPublicJwk = publicJwk as { x: string; y: string }
-    const xHex = Buffer.from(ecPublicJwk.x, 'base64url').toString('hex')
-    const yHex = Buffer.from(ecPublicJwk.y, 'base64url').toString('hex')
+    const xHex = TypedArrayEncoder.toHex(TypedArrayEncoder.fromBase64Url(ecPublicJwk.x))
+    const yHex = TypedArrayEncoder.toHex(TypedArrayEncoder.fromBase64Url(ecPublicJwk.y))
     const fullPublicKeyHex = xHex + yHex
     const did = buildDid(options.method, options.options.network, fullPublicKeyHex)
 

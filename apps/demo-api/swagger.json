@@ -259,6 +259,86 @@
           }
         }
       }
+    },
+    "/schemas/create": {
+      "post": {
+        "tags": ["Credo Module - Schemas"],
+        "summary": "Create a schema using the Credo Polygon module",
+        "description": "Creates a schema on-chain and uploads it to the file server using @ayanworks/credo-polygon-w3c-module.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Create schema",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["schemaName", "schema", "privateKey"],
+              "properties": {
+                "did": {
+                  "type": "string",
+                  "example": "did:polygon:testnet:0x794b781493AeD65b9ceBD680716fec257e118993"
+                },
+                "privateKey": {
+                  "type": "string",
+                  "example": "0xd922b5e24ab1132f68d8c3a3e758d6814f71d5b1acffdffa6a19b8f8d55db507"
+                },
+                "networkType": {
+                  "type": "string",
+                  "enum": ["testnet", "mainnet"],
+                  "example": "testnet"
+                },
+                "schemaName": {
+                  "type": "string",
+                  "example": "TestSchema"
+                },
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Schema created successfully"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
+    },
+    "/schemas/{did}/{schemaId}": {
+      "get": {
+        "tags": ["Credo Module - Schemas"],
+        "summary": "Get schema by DID and schema ID",
+        "description": "Retrieves a schema using the Credo Polygon module.",
+        "parameters": [
+          {
+            "name": "did",
+            "in": "path",
+            "description": "DID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "schemaId",
+            "in": "path",
+            "description": "Schema ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Schema retrieved successfully"
+          },
+          "500": {
+            "description": "Error message"
+          }
+        }
+      }
     }
   }
 }

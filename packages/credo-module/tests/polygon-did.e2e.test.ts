@@ -12,7 +12,7 @@ import { PolygonModule } from '../src/PolygonModule'
 
 import { PolygonDIDFixtures } from './fixtures'
 
-const logger = new ConsoleLogger(LogLevel.info)
+const logger = new ConsoleLogger(LogLevel.Info)
 
 export type SubjectMessage = { message: DidCommEncryptedMessage; replySubject?: Subject<SubjectMessage> }
 

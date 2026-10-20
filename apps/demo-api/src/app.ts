@@ -9,6 +9,7 @@ import { Broadcast } from './routes/broadcast'
 import { CreateDid } from './routes/create-did'
 import { RegisterDid } from './routes/register-did'
 import { ResolveDid } from './routes/resolve-did'
+import { Schemas } from './routes/schemas'
 import { TxIntent } from './routes/tx-intent'
 import { UpdateDid } from './routes/update-did'
 
@@ -21,6 +22,7 @@ class App {
   public updateDidRoutes: UpdateDid = new UpdateDid()
   public txIntentRoutes: TxIntent = new TxIntent()
   public broadcastRoutes: Broadcast = new Broadcast()
+  public schemasRoutes: Schemas = new Schemas()
 
   public constructor() {
     this.app = express()
@@ -32,6 +34,7 @@ class App {
     this.updateDidRoutes.routes(this.app)
     this.txIntentRoutes.routes(this.app)
     this.broadcastRoutes.routes(this.app)
+    this.schemasRoutes.routes(this.app)
   }
 
   private config(): void {
@@ -40,7 +43,15 @@ class App {
     // The network this instance is wired to. Public information, and it lets the
     // playground show what a visitor is actually talking to.
     this.app.get('/config', (_req, res) => {
-      res.status(200).json({ success: true, data: { rpcUrl: config.rpcUrl, contractAddress: config.contractAddress } })
+      res.status(200).json({
+        success: true,
+        data: {
+          rpcUrl: config.rpcUrl,
+          contractAddress: config.contractAddress,
+          schemaManagerContractAddress: config.schemaManagerContractAddress,
+          serverUrl: config.serverUrl,
+        },
+      })
     })
 
     this.app.use(express.json())

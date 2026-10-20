@@ -9,7 +9,7 @@ import { afterAll, beforeAll, describe, it } from 'vitest'
 import { PolygonDidRegistrar, PolygonDidResolver } from '../src/dids'
 import { PolygonModule } from '../src/PolygonModule'
 
-const logger = new ConsoleLogger(LogLevel.info)
+const logger = new ConsoleLogger(LogLevel.Info)
 
 export type SubjectMessage = { message: DidCommEncryptedMessage; replySubject?: Subject<SubjectMessage> }
 

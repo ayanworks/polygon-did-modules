@@ -19,13 +19,20 @@
     "@ayanworks/polygon-did-registrar": "workspace:*",
     "@ayanworks/polygon-did-registry-contract": "workspace:*",
     "@ayanworks/polygon-did-resolver": "workspace:*",
+    "@ayanworks/polygon-schema-manager": "workspace:*",
+    "@ayanworks/credo-polygon-w3c-module": "workspace:*",
+    "@credo-ts/askar": "^0.7.2",
+    "@credo-ts/core": "^0.7.2",
+    "@credo-ts/node": "^0.7.2",
+    "@openwallet-foundation/askar-nodejs": "0.6.0",
     "cors": "^2.8.6",
     "did-resolver": "catalog:",
     "dotenv": "^18.0.8",
     "ethers": "catalog:",
     "express": "^4.22.3",
     "log4js": "^6.9.1",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "catalog:"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -458,6 +458,40 @@ const ENDPOINTS = [
     body: null,
   },
   {
+    method: 'POST',
+    path: '/schemas/create',
+    description: 'Credo Module: create a schema on-chain and upload to the file server.',
+    body: () => ({
+      did: state.did,
+      privateKey: state.privateKey,
+      networkType: state.did?.includes(':testnet:')
+        ? 'testnet'
+        : state.did?.includes('did:polygon:0x') && !state.did.includes(':testnet:')
+          ? 'mainnet'
+          : 'testnet',
+      schemaName: 'TestSchema',
+      schema: {
+        '@context': [
+          { '@version': 1.1 },
+          'https://www.w3.org/ns/odrl.jsonld',
+          {
+            ex: 'https://example.org/examples#',
+            schema: 'http://schema.org/',
+            rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            name: 'schema:name',
+          },
+        ],
+      },
+    }),
+  },
+  {
+    method: 'GET',
+    path: '/schemas/{did}/{schemaId}',
+    description: 'Credo Module: retrieve a schema by DID and schema ID.',
+    pathFor: () => `/schemas/${encodeURI(state.did)}/${$('schema-id')?.value || 'schema-id'}`,
+    body: null,
+  },
+  {
     method: 'DELETE',
     path: '/delete-did/...',
     description: 'Removed: neither the registrar library nor the registry contract supports deleting a DID.',
@@ -673,6 +707,66 @@ const wire = () => {
       privateKey: state.privateKey,
       didDoc: parseDoc(),
     })
+  })
+
+  $('run-create-schema')?.addEventListener('click', async () => {
+    try {
+      if (!state.did) throw new Error('Generate or load an identity first')
+      if (!state.privateKey) throw new Error('A private key is required for schema operations')
+      let schema
+      try {
+        schema = JSON.parse($('schema-json').value)
+      } catch (error) {
+        throw new Error(`Schema JSON is not valid: ${error.message}`)
+      }
+      const networkType = state.did.includes(':testnet:')
+        ? 'testnet'
+        : state.did.startsWith('did:polygon:0x')
+          ? 'mainnet'
+          : 'testnet'
+      const result = await api('POST', '/schemas/create', {
+        did: state.did,
+        privateKey: state.privateKey,
+        networkType,
+        schemaName: $('schema-name').value || 'TestSchema',
+        schema,
+      })
+      const resEl = $('schema-result')
+      if (resEl) {
+        resEl.hidden = false
+        setResult(resEl, result)
+      }
+    } catch (error) {
+      const resEl = $('schema-result')
+      if (resEl) {
+        resEl.hidden = false
+        setResult(resEl, { success: false, message: error.message }, true)
+      } else {
+        alert(error.message)
+      }
+    }
+  })
+
+  $('run-get-schema')?.addEventListener('click', async () => {
+    try {
+      if (!state.did) throw new Error('Generate or load an identity first')
+      const schemaId = $('schema-id').value.trim()
+      if (!schemaId) throw new Error('Schema ID is required')
+      const result = await api('GET', `/schemas/${encodeURI(state.did)}/${encodeURI(schemaId)}`)
+      const resEl = $('schema-result')
+      if (resEl) {
+        resEl.hidden = false
+        setResult(resEl, result)
+      }
+    } catch (error) {
+      const resEl = $('schema-result')
+      if (resEl) {
+        resEl.hidden = false
+        setResult(resEl, { success: false, message: error.message }, true)
+      } else {
+        alert(error.message)
+      }
+    }
   })
 
   $('clear-log').addEventListener('click', () => {

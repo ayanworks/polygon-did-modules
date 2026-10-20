@@ -1,5 +1,12 @@
 # @ayanworks/polygon-schema-manager
 
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [2eb0b65]
+  - @ayanworks/polygon-did-resolver@1.1.0
+
 ## 2.2.2
 
 ### Patch Changes

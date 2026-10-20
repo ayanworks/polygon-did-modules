@@ -14,6 +14,9 @@
     ".pnpm",
     "**/.pnpm/**",
     "**/artifacts/**",
+    // Deno-only deployment server: it uses Deno globals that Node's types do not
+    // declare, and it is type-checked with `deno check` instead.
+    "**/deploy/**",
     // We are adding this to exclude because the type checks will fail as the contract json is only created after compile
     "packages/did-registry-contract/src"
   ]

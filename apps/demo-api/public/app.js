@@ -55,7 +55,9 @@ const parseDoc = () => {
 /* ------------------------------------------------------- request logging */
 
 const buildCurl = ({ method, path, body }) => {
-  const parts = [`curl -s -X ${method} '${location.origin}${path}'`]
+  // Must point at the API, not the page: when the UI is hosted separately the
+  // page's own origin would send someone to the wrong host.
+  const parts = [`curl -s -X ${method} '${API_BASE || location.origin}${path}'`]
   if (body !== undefined) {
     parts.push(`-H 'content-type: application/json' -d '${JSON.stringify(body)}'`)
   }
@@ -116,6 +118,22 @@ const resultPane = (value) => {
 
 /* ---------------------------------------------------------- http helper */
 
+/**
+ * Where the API lives. Same-origin by default, so running the server locally
+ * needs no configuration. When the page is hosted separately (for example the
+ * static UI on Deno Deploy talking to an API elsewhere) set `window.API_BASE`
+ * to the API's origin via a small inline script or a `<meta>` tag before this
+ * module loads.
+ */
+const API_BASE = (() => {
+  const configured = window.API_BASE ?? document.querySelector('meta[name="api-base"]')?.content
+  if (!configured) return ''
+  // Trailing slashes would produce '//create-did' once concatenated.
+  return String(configured).replace(/\/+$/, '')
+})()
+
+const apiUrl = (path) => `${API_BASE}${path}`
+
 const api = async (method, path, body) => {
   const options = { method, headers: {} }
   if (body !== undefined) {
@@ -125,7 +143,7 @@ const api = async (method, path, body) => {
 
   let response
   try {
-    response = await fetch(path, options)
+    response = await fetch(apiUrl(path), options)
   } catch (error) {
     appendLog({ method, path, body, error })
     throw error
@@ -317,6 +335,7 @@ const syncOperationToChainState = (document) => {
 const runKeyless = async (signerName) => {
   const steps = ['step-intent', 'step-sign', 'step-broadcast', 'step-verify']
   resetSteps(steps)
+  hideFundingHelp()
 
   try {
     if (!state.did) throw new Error('Generate or load an identity first')
@@ -356,12 +375,38 @@ const runKeyless = async (signerName) => {
     const running = steps.map((id) => $(id)).find((element) => element.dataset.state === 'run')
     if (running) setStep(running.id, `${running.dataset.label} - ${error.message}`, 'err')
     else setStep('step-intent', error.message, 'err')
+
+    if (isFundingError(error.message)) showFundingHelp()
   }
+}
+
+/**
+ * The address that must hold gas. In the keyless flow that is whichever key
+ * signs, so the wallet address wins when a wallet did the signing.
+ */
+const signingAddress = () => state.walletAddress ?? state.did.split(':').pop() ?? ''
+
+/**
+ * A funding problem is the one broadcast failure a visitor can actually fix, so
+ * it gets an explanation and a faucet link rather than a bare error string. The
+ * message comes back as a JSON-RPC error, hence the loose match.
+ */
+const isFundingError = (message) => /insufficient funds|INSUFFICIENT_FUNDS|gas \* price|balance 0/i.test(message)
+
+const showFundingHelp = () => {
+  const address = signingAddress()
+  $('funding-address').textContent = address || 'unknown - generate an identity first'
+  $('funding-help').hidden = false
+  $('funding-help').scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+}
+
+const hideFundingHelp = () => {
+  $('funding-help').hidden = true
 }
 
 const resolveWithRetry = async (did, attempts = 6, delayMs = 2500) => {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const response = await fetch(`/resolve-did/${encodeURI(did)}`)
+    const response = await fetch(apiUrl(`/resolve-did/${encodeURI(did)}`))
     if (response.ok) {
       const document = await response.json()
       if (document?.id) return document
@@ -593,6 +638,17 @@ const wire = () => {
   $('run-keyless').addEventListener('click', () => runKeyless('in-browser key'))
   $('signer-wallet').addEventListener('click', () => runKeyless('wallet'))
 
+  $('copy-address').addEventListener('click', async () => {
+    await navigator.clipboard.writeText($('funding-address').textContent)
+    $('copy-address').textContent = 'Copied'
+    setTimeout(() => {
+      $('copy-address').textContent = 'Copy'
+    }, 1200)
+  })
+
+  // Re-running is the same flow, and it re-reads the nonce, so a funded address
+  // does not need a fresh intent built by hand.
+  $('retry-keyless').addEventListener('click', () => runKeyless('in-browser key'))
   $('run-resolve').addEventListener('click', async () => {
     try {
       const document = await api('GET', `/resolve-did/${encodeURI(state.did)}`)

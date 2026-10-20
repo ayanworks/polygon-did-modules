@@ -3,14 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Polygon DID Demo - Playground</title>
+  <meta name="theme-color" content="#0a1628">
+  <!-- Leave empty when the UI is served by the API (the default, and how it runs
+       locally). Set it to the API origin only when the UI is hosted separately,
+       e.g. the static playground on Deno Deploy talking to an API elsewhere.
+       A build step or an edge rewrite can fill this in. -->
+  <meta name="api-base" content="">
+  <title>Polygon DID Playground - AYANWORKS</title>
+  <link rel="icon" href="./favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <h1>Polygon DID Playground</h1>
-      <p class="subtitle">Create, register, resolve and update <code>did:polygon</code> DIDs against the demo API - with or without handing over a key.</p>
+      <img class="brand-logo" src="./assets/ayanworks-logo.svg" alt="AYANWORKS">
+      <span class="brand-divider"></span>
+      <div>
+        <h1>Polygon DID Playground</h1>
+        <p class="subtitle">Create, register, resolve and update <code>did:polygon</code> DIDs against the demo API - with or without handing over a key.</p>
+      </div>
     </div>
     <div class="topbar-actions">
       <span id="wallet-status" class="pill">wallet: checking...</span>
@@ -84,6 +100,32 @@
         <li id="step-broadcast" data-label="POST /broadcast - not started" data-state="idle">POST /broadcast - not started</li>
         <li id="step-verify" data-label="GET /resolve-did - not started" data-state="idle">GET /resolve-did - not started</li>
       </ol>
+
+      <div id="funding-help" class="funding" hidden>
+        <div class="funding-head">
+          <span class="tag warn">needs testnet POL</span>
+          <strong>This address has no funds to pay for the transaction.</strong>
+        </div>
+        <p class="hint">
+          The address that signs must hold a little <b>POL</b> on <b>Amoy</b> to cover gas. Your key never
+          leaves this page, so the server cannot top it up for you — fund it from a faucet, then run the flow again.
+        </p>
+        <div class="funding-address">
+          <span class="funding-label">Fund this address</span>
+          <code id="funding-address">-</code>
+          <button id="copy-address" class="ghost small">Copy</button>
+        </div>
+        <div class="row">
+          <a class="btn-link" id="faucet-link" href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">
+            Open the Polygon faucet ↗
+          </a>
+          <button id="retry-keyless" class="ghost small">I funded it — run again</button>
+        </div>
+        <p class="hint small">
+          Faucets give one drip per address per day and can take a minute to land. Any gas-free drip works;
+          the official one is linked above.
+        </p>
+      </div>
     </section>
 
     <section class="card">
@@ -132,6 +174,16 @@
       <div id="log" class="log"></div>
     </section>
   </main>
+
+  <footer class="footer">
+    <img class="footer-logo" src="./assets/ayanworks-logo.svg" alt="AYANWORKS">
+    <p class="footer-note">
+      Built by <a class="link" href="https://www.ayanworks.com" target="_blank" rel="noreferrer">AYANWORKS</a>
+      &middot; Digital Trust Infrastructure &middot;
+      <a class="link" href="https://www.ayanworks.com/credebl" target="_blank" rel="noreferrer">CREDEBL</a>
+    </p>
+    <p class="footer-note dim">Keys are generated in your browser and never persisted. This playground talks to the Amoy testnet.</p>
+  </footer>
 
   <script src="./app.js" type="module"></script>
 </body>

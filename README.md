@@ -70,7 +70,6 @@ in `@ayanworks/polygon-did-registrar` 3.0.0 to encode the 33 key bytes rather th
 Values written by older versions are unusable and the document has to be re-published - see
 [Repairing an affected DID](./packages/did-registrar/README.md#repairing-an-affected-did).
 
-
 ### Setup
 
 ```bash

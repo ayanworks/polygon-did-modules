@@ -139,4 +139,44 @@ describe('playground UI', () => {
     expect(res.status).toBe(404)
     expect(res.text).not.toContain('Polygon DID Playground')
   })
+
+  it('routes every request through the configurable API base', async () => {
+    const page = await request(app).get('/')
+    const script = await request(app).get('/app.js')
+
+    // Empty by default, which keeps the page same-origin when the API serves it.
+    expect(page.text).toContain('<meta name="api-base" content="">')
+
+    // A split deployment (static UI, API elsewhere) only works if nothing calls
+    // a relative path directly - that would hit the UI's host instead. Assert
+    // the property rather than a pattern: every fetch must go through apiUrl().
+    expect(script.text).toContain('apiUrl(')
+    const fetches = script.text.match(/fetch\([^)]*/g) ?? []
+    expect(fetches.length).toBeGreaterThan(0)
+    for (const call of fetches) {
+      expect(call).toContain('apiUrl(')
+    }
+  })
+
+  it('carries the AYANWORKS branding', async () => {
+    const page = await request(app).get('/')
+    const styles = await request(app).get('/styles.css')
+
+    // The lockup is served from our own origin, so the page has no dependency
+    // on ayanworks.com at runtime.
+    expect(page.text).toContain('./assets/ayanworks-logo.svg')
+    expect(page.text).toContain('favicon.ico')
+    expect(page.text).toContain('AYANWORKS')
+
+    const logo = await request(app).get('/assets/ayanworks-logo.svg')
+    expect(logo.status).toBe(200)
+    expect(logo.headers['content-type']).toContain('svg')
+
+    const favicon = await request(app).get('/favicon.ico')
+    expect(favicon.status).toBe(200)
+
+    // The navy surface and sovereign gold accent, straight from ayanworks.com.
+    expect(styles.text).toContain('--bg: #0a1628')
+    expect(styles.text).toContain('--accent: #c8903f')
+  })
 })

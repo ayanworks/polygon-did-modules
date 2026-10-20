@@ -1,5 +1,11 @@
 # @ayanworks/polygon-did-resolver
 
+## 1.0.4
+
+### Patch Changes
+
+- ea8d5e9: Replace the dead Polygon Amoy testnet RPC default (`rpc-amoy.polygon.technology` no longer resolves in DNS) with the public endpoint `https://polygon-amoy-bor-rpc.publicnode.com`. Test fixtures across the workspace were updated to the same endpoint.
+
 ## 1.0.3
 
 ### Patch Changes

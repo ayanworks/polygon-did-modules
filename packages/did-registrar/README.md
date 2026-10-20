@@ -15,7 +15,7 @@ The DID identifier allows the controller to resolve DID document for usage in di
       "id": "did:polygon:0x794b781493AeD65b9ceBD680716fec257e118993",
       "type": "EcdsaSecp256k1VerificationKey2019",
       "controller": ["did:polygon:0x794b781493AeD65b9ceBD680716fec257e118993"],
-      "publicKeyBase58": "7Lnm1ZnseKDkH1baAb1opREfAU4MPY7zCdUDSrWSm9NxNTQmy4neU9brFUYnEcyy7CwFKjD11ikyP9J8cf6zEaAKrEzzp"
+      "publicKeyBase58": "29rkwHiVCjyhXk9FWhepUrHpEyurUSCFHh4aoDqb1adj8"
     }
   ]
 }
@@ -62,6 +62,67 @@ const keys = await createKeyPair(network)
 ```
 
 The function returns address, privateKey, publicKeyBase58, did
+
+### `publicKeyBase58` encoding
+
+`publicKeyBase58` is the Base58 encoding of the **33 compressed public-key bytes**. It is the same
+derivation used by the registry documents on chain and by `@ayanworks/polygon-did-credo-module`, so a
+document built from this value is verifiable by any other implementation.
+
+> **Changed in 3.0.0.** Earlier versions Base58-encoded the hex *text* of the public key instead of its
+> bytes. The output was longer than a valid key (~93 characters rather than ~44) and decoded to the
+> 68-byte ASCII string `"0x03ab..."` rather than the key, so no verifier could use it. See
+> [Repairing an affected DID](#repairing-an-affected-did) if you persisted an older value.
+
+## Browser
+
+The package is pure TypeScript on top of `ethers` and uses no Node built-ins, so it bundles for the
+browser with no polyfills and no `Buffer` shim:
+
+```sh
+npx esbuild your-entry.ts --bundle --format=esm --platform=browser \
+  --main-fields=browser,module,main --conditions=browser,import,default \
+  --outfile=public/bundle.js
+```
+
+```js
+import { PolygonDID } from '@ayanworks/polygon-did-registrar'
+import { getResolver } from '@ayanworks/polygon-did-resolver'
+import { Resolver } from 'did-resolver'
+
+const { privateKey, publicKeyBase58, did } = PolygonDID.createKeyPair('testnet')
+
+// Reads go straight to the RPC from the page.
+const document = await new Resolver(getResolver()).resolve(did)
+
+// Writes sign in the page and broadcast the raw transaction, so the key never
+// leaves the browser.
+const signed = await new Wallet(privateKey).signTransaction(txFromTheRpc)
+await provider.broadcastTransaction(signed)
+```
+
+Notes:
+
+- **No private key needs to leave the browser.** The registry accepts a signed raw transaction, so a
+  page can sign locally and post the result.
+- Public RPC endpoints must send `access-control-allow-origin` for browser reads to work. The default
+  Amoy endpoint does; a private endpoint may need CORS enabled.
+- The bundle is ~900 KB raw / ~160 KB gzipped, essentially all `ethers`.
+
+## Repairing an affected DID
+
+A DID registered before 3.0.0 holds an unusable `publicKeyBase58`. It **cannot be re-registered** -
+`createDID` reverts with `DID already exist` - but it **can be repaired in place**, because
+`updateDIDDoc` overwrites the stored document:
+
+```js
+const corrected = { ...document, verificationMethod: [{ ...vm, publicKeyBase58: correctBase58 }] }
+await polygonDID.update(did, corrected)
+```
+
+`updateDIDDoc` is guarded by `onlyController`, so this requires the DID's private key. Without it the
+document cannot be corrected and the identity must be replaced. To detect affected documents, decode the
+stored value: 33 bytes is correct, 68 bytes is the old encoding.
 
 ## Register
 

@@ -124,7 +124,7 @@ node apps/demo-api/keyless-demo.mjs
 ```
 
 ```js
-import { SigningKey, Wallet, encodeBase58, toUtf8Bytes } from 'ethers'
+import { SigningKey, Wallet, encodeBase58, getBytes } from 'ethers'
 
 const API = 'http://localhost:8081'
 
@@ -135,7 +135,10 @@ const did = `did:polygon:testnet:${wallet.address}`
 // Step 1 - build the DID document locally from the PUBLIC key only.
 // (Same shape that POST /create-did produces; the demo API derives the base58
 //  key the same way, so documents from both paths are interchangeable.)
-const publicKeyBase58 = encodeBase58(toUtf8Bytes(SigningKey.computePublicKey(wallet.privateKey, true)))
+// The payload is the 33 key BYTES - `getBytes` decodes the hex. Base58-encoding
+// the hex text instead produces a value that decodes to the ASCII string
+// "0x03ab..." and that no verifier can use.
+const publicKeyBase58 = encodeBase58(getBytes(SigningKey.computePublicKey(wallet.privateKey, true)))
 const didDoc = {
   '@context': ['https://w3id.org/did/v1', 'https://w3id.org/security/suites/secp256k1-2019/v1'],
   id: did,
@@ -184,6 +187,38 @@ console.log('on chain:', resolution.id === did)
 rejects the transaction and `/broadcast` answers
 `{"success":false,"message":"insufficient funds for intrinsic transaction cost"}`. Get test MATIC
 from the [Polygon Amoy faucet](https://faucet.polygon.technology/) (network *Amoy*, token *POL*).
+
+### DIDs registered with the old `publicKeyBase58`
+
+Before `@ayanworks/polygon-did-registrar` 3.0.0, `PolygonDID.createKeyPair` base58-encoded the **hex
+text** of the public key instead of its bytes. The result still looked plausible - it was just longer -
+but it decoded to the 68-byte ASCII string `"0x03ab..."` rather than the 33-byte key, so no verifier
+could use it. Any DID registered from that output carries an unusable `publicKeyBase58`.
+
+**Those DIDs cannot be re-registered** - `createDID` reverts with `DID already exist` for an address
+that already has a document. They can however be **repaired in place**, because `updateDIDDoc`
+overwrites the stored document:
+
+1. Rebuild the document with the corrected key (step 1 above).
+2. Run the keyless flow with `operation: 'update'` - `/tx-intent` -> sign locally -> `/broadcast`.
+3. Re-resolve and confirm `publicKeyBase58` decodes to 33 bytes.
+
+`updateDIDDoc` is guarded by `onlyController`, so **only the holder of the DID's private key** can
+perform this. If that key is lost the document cannot be corrected; the DID has to be replaced with a
+newly generated one.
+
+To check whether a given DID needs repair:
+
+```bash
+curl -s "$API/resolve-did/$DID" \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
+      const A="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+      const b58=JSON.parse(s).verificationMethod[0].publicKeyBase58
+      let n=0n; for (const c of b58) n=n*58n+BigInt(A.indexOf(c))
+      let h=n.toString(16); if (h.length%2) h="0"+h
+      console.log(b58, "->", h.length/2, "bytes", h.length/2===33 ? "(OK)" : "(needs repair)")
+    })'
+```
 To try register-then-update, run step 2-4 again with `operation: 'update'` and a modified `didDoc` -
 `/tx-intent` refuses `create` for an existing DID and `update` for an unknown one, mirroring the
 custodial endpoints.

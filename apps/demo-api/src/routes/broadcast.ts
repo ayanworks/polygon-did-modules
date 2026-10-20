@@ -50,6 +50,12 @@ export class Broadcast {
         if (!transaction.to || transaction.to.toLowerCase() !== config.contractAddress.toLowerCase()) {
           throw new Error(`signed transaction must target the DID registry contract at ${config.contractAddress}`)
         }
+        // Defence in depth: the registry methods are nonpayable so a value would
+        // revert on chain anyway, but refusing it here keeps the relay from
+        // forwarding value it never intends to move.
+        if (transaction.value !== 0n) {
+          throw new Error('signed transaction must not transfer value')
+        }
         const selector = transaction.data.slice(0, 10).toLowerCase()
         if (!ALLOWED_SELECTORS.has(selector)) {
           throw new Error('signed transaction contains an unsupported method')

@@ -2,7 +2,7 @@ import { buildTestDidDoc } from '../utils/array'
 
 export const updateDidDocument = buildTestDidDoc(
   'did:polygon:testnet:0x13cd23928Ae515b86592C630f56C138aE4c7B79a',
-  '7Lnm1Zi2K75KVgHPrHADCpfa9cLAtRRocBgLsFVLw5NRPUgoLBBv1Se8ttjx4P7fXfNS5gazJmKqohNmwEqx8VjDYfPvw',
+  '23epRKvVkJq16fgdd7iaN1X8ngDwWF9zMHnkEs9iD4meD',
   'https://example.com'
 )
 
@@ -30,7 +30,7 @@ export const testDidDetails = {
   address: '0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
   did: 'did:polygon:testnet:0x4487cB2567De2Ca6dc5F79A7f6ae944522C4b698',
   privateKey: '6320c5bcc5edfb1f3324b94a67c0e69916d828d6374ddb1dfeae92c27e3098de', //test key
-  publicKeyBase58: '7Lnm1Zi2K75KVgHPrHADCpfa9cLAtRRocBgLsFVLw5NRPUgoLBBv1Se8ttjx4P7fXfNS5gazJmKqohNmwEqx8VjDYfPvw',
+  publicKeyBase58: '28wpkbcBRyRDHAiVmRaAPYUjTYEWpjZTH6PzmC3sfZcpx',
 }
 
 export const testContractDetails = {

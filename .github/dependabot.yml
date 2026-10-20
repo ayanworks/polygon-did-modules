@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # Dependencies of the pnpm workspace (packages/*, apps/*) and the shared catalog in pnpm-workspace.yaml
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    groups:
+      # Group routine bumps into a single PR per dependency class; majors stay in their own PRs.
+      production-minor-and-patch:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      development-minor-and-patch:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+    ignore:
+      # Workspace packages are versioned and released from this repository (changesets).
+      - dependency-name: "@ayanworks/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      github-actions:
+        patterns: ["*"]

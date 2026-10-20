@@ -20,6 +20,13 @@ This monorepo contains the following packages:
 | `did-registry-contract` | Smart contract for DID registry | ![npm](https://img.shields.io/npm/v/@ayanworks/polygon-did-registry-contract) |
 
 
+## Apps
+
+| App | Description |
+|-----|-------------|
+| `demo-api` | Demo REST API (`create`/`register`/`resolve`/`update` DID) with Swagger UI, consuming the packages in this workspace via `workspace:*` - see [apps/demo-api](./apps/demo-api) |
+
+
 ### Setup
 
 ```bash

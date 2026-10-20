@@ -87,7 +87,7 @@ describe('Secp256k1 W3cCredentialService', () => {
             },
           }),
           polygon: new PolygonModule({
-            rpcUrl: 'https://rpc-amoy.polygon.technology',
+            rpcUrl: 'https://polygon-amoy-bor-rpc.publicnode.com',
             didContractAddress: '0xcB80F37eDD2bE3570c6C9D5B0888614E04E1e49E',
             fileServerToken:
               'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBeWFuV29ya3MiLCJpZCI6IjdmYjRmN2I3LWQ5ZWUtNDYxOC04OTE4LWZiMmIzYzY1M2EyYiJ9.x-kHeTVqX4w19ibSAspCYgIL-JFVss8yZ0CT21QVRYM',

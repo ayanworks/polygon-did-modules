@@ -24,7 +24,30 @@ This monorepo contains the following packages:
 
 | App | Description |
 |-----|-------------|
-| `demo-api` | Demo REST API (`create`/`register`/`resolve`/`update` DID) with Swagger UI, consuming the packages in this workspace via `workspace:*` - see [apps/demo-api](./apps/demo-api) |
+| `demo-api` | Demo REST API (`create`/`register`/`resolve`/`update` DID) with Swagger UI **and a browser playground**, consuming the packages in this workspace via `workspace:*` - see [apps/demo-api](./apps/demo-api) |
+
+
+### Running the demo
+
+The demo app serves three surfaces from one Express process on one port, so a single command is all
+you need:
+
+```bash
+pnpm install
+pnpm build
+pnpm --filter @ayanworks/polygon-did-demo-api dev
+```
+
+Then open:
+
+- **Playground UI** - <http://localhost:8081/> - generate an identity in the browser and exercise every
+  endpoint, including the keyless flow where the private key never leaves the page.
+- **Swagger UI** - <http://localhost:8081/index> - the REST contract.
+- **REST API** - <http://localhost:8081/> - `curl http://localhost:8081/config` to confirm it is up.
+
+Defaults to the Amoy testnet on port `8081`; override with `PORT`, `POLYGON_RPC_URL` and
+`POLYGON_CONTRACT_ADDRESS`. See [apps/demo-api/README.md](./apps/demo-api/README.md) for the endpoint
+reference and the local-signing walkthrough.
 
 
 ### Setup

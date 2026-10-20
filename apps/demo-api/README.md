@@ -40,11 +40,17 @@ What it gives you:
 - **A request log** with the exact payload, the response, and a copyable `curl` for every call, plus a
   card per endpoint where you can edit the body and send it.
 
+The page wears AYANWORKS branding - the navy surfaces and sovereign-gold accent are taken from
+[ayanworks.com](https://www.ayanworks.com), and the lockup in `public/assets/` is served from this app
+rather than hot-linked. Only the two web fonts (Inter, JetBrains Mono) are fetched from a CDN.
+
 Notes:
 
 - Nothing is persisted. Keys live only in the page and disappear on reload; the "sample" identity ships
   no key, so it can be resolved but not written to.
 - The page loads `ethers` from a CDN, so it needs network access. The API itself does not.
+- Branding assets (the logo and favicon) are bundled locally, so the page still looks right offline;
+  only the `ethers` import and the two web fonts need the network.
 - `GET /config` reports the RPC URL and registry address the instance is wired to (public information),
   which the page uses to tell you what you are actually talking to.
 
@@ -180,8 +186,36 @@ See `.env.example`.
 
 ## Run
 
+One command starts everything - the REST API, Swagger UI and the playground are all served by the same
+Express app, so there is no second process and no second port.
+
 ```bash
 pnpm --filter @ayanworks/polygon-did-demo-api dev
+```
+
+Then open:
+
+| Surface | URL | What it is |
+|---------|-----|------------|
+| Playground UI | <http://localhost:8081/> | The clickable page: generate an identity, run the keyless flow, try every endpoint |
+| Swagger UI | <http://localhost:8081/index> | The API contract, generated from `swagger.json` |
+| REST API | <http://localhost:8081/> | Call it directly, e.g. `curl http://localhost:8081/config` |
+| Config | <http://localhost:8081/config> | The RPC URL and registry address this instance is wired to |
+
+Port `8081` is the default; set `PORT` to change it. Unknown paths return JSON `404`, not the HTML page -
+only `/` serves the playground.
+
+Quick check that it is up:
+
+```bash
+curl -s http://localhost:8081/config
+# {"success":true,"data":{"rpcUrl":"...","contractAddress":"0x..."}}
+```
+
+For a scripted walkthrough of the keyless flow (no browser, signs with a throwaway key):
+
+```bash
+node apps/demo-api/keyless-demo.mjs
 ```
 
 ## Test

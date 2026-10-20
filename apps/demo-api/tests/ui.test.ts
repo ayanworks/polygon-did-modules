@@ -139,4 +139,26 @@ describe('playground UI', () => {
     expect(res.status).toBe(404)
     expect(res.text).not.toContain('Polygon DID Playground')
   })
+
+  it('carries the AYANWORKS branding', async () => {
+    const page = await request(app).get('/')
+    const styles = await request(app).get('/styles.css')
+
+    // The lockup is served from our own origin, so the page has no dependency
+    // on ayanworks.com at runtime.
+    expect(page.text).toContain('./assets/ayanworks-logo.svg')
+    expect(page.text).toContain('favicon.ico')
+    expect(page.text).toContain('AYANWORKS')
+
+    const logo = await request(app).get('/assets/ayanworks-logo.svg')
+    expect(logo.status).toBe(200)
+    expect(logo.headers['content-type']).toContain('svg')
+
+    const favicon = await request(app).get('/favicon.ico')
+    expect(favicon.status).toBe(200)
+
+    // The navy surface and sovereign gold accent, straight from ayanworks.com.
+    expect(styles.text).toContain('--bg: #0a1628')
+    expect(styles.text).toContain('--accent: #c8903f')
+  })
 })

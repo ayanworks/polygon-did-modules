@@ -247,6 +247,18 @@
           }
         }
       }
+    },
+    "/config": {
+      "get": {
+        "tags": ["Configuration"],
+        "summary": "Report the network this instance is wired to",
+        "description": "Returns the RPC URL and the DID registry contract address the API is configured with. Public information, also used by the web playground.",
+        "responses": {
+          "200": {
+            "description": "RPC URL and contract address"
+          }
+        }
+      }
     }
   }
 }

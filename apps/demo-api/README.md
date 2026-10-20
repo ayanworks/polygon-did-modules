@@ -20,6 +20,34 @@ Interactive documentation: `http://localhost:8081/index`
 > The former `DELETE /delete-did/:did/:privateKey` endpoint has been removed: neither the registrar 2.x
 > API nor the `PolygonDidRegistry` smart contract supports deleting a DID.
 
+## Web playground
+
+The API also serves a browser playground at **`http://localhost:8081/`** - no build step, no login. It is
+plain HTML/JS served straight from [`public/`](./public) by the same Express app, so starting the server is
+all it takes. It exists so anyone can exercise every endpoint without writing a request by hand.
+
+What it gives you:
+
+- **Generate an identity in the browser.** The key pair and DID document are produced locally with
+  [`ethers`](https://docs.ethers.io) (loaded from a CDN), and the derivation is byte-for-byte identical to
+  `POST /create-did` - so a DID you make in the page is a real `did:polygon` DID.
+- **Run the keyless flow.** The page asks `/tx-intent` for the unsigned transaction, signs it locally
+  (in-browser key **or** an EIP-1193 wallet such as MetaMask), then relays it through `/broadcast`. The
+  step list shows exactly where the key was used. The server never sees it.
+- **Resolve any DID**, including the on-chain sample that is already registered.
+- **Exercise the custodial routes** too, behind a confirmation dialog that spells out that the key will
+  be sent to the API.
+- **A request log** with the exact payload, the response, and a copyable `curl` for every call, plus a
+  card per endpoint where you can edit the body and send it.
+
+Notes:
+
+- Nothing is persisted. Keys live only in the page and disappear on reload; the "sample" identity ships
+  no key, so it can be resolved but not written to.
+- The page loads `ethers` from a CDN, so it needs network access. The API itself does not.
+- `GET /config` reports the RPC URL and registry address the instance is wired to (public information),
+  which the page uses to tell you what you are actually talking to.
+
 ## Local signing (keyless flow, recommended)
 
 The custodial endpoints mirror the registrar library and are fine for local demos, but a private key

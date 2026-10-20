@@ -70,6 +70,7 @@ describe('application wiring', () => {
     expect(res.text).toContain('/update-did/{did}')
     expect(res.text).toContain('/tx-intent')
     expect(res.text).toContain('/broadcast')
+    expect(res.text).toContain('/config')
     // The delete endpoint and the retired key-in-the-URL update route are gone from the contract.
     expect(res.text).not.toContain('/delete-did')
     expect(res.text).not.toContain('/update-did/{did}/{privateKey}')

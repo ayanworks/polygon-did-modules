@@ -17,7 +17,7 @@ import { askar } from '@openwallet-foundation/askar-nodejs'
 import { PolygonDidRegistrar, PolygonDidResolver } from '../src/dids'
 import { PolygonModule } from '../src/PolygonModule'
 
-const testLogger = new ConsoleLogger(LogLevel.off)
+const testLogger = new ConsoleLogger(LogLevel.Off)
 
 export function getAskarStoreConfig(
   name: string,

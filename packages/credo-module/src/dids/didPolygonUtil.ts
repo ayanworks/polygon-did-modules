@@ -3,6 +3,7 @@ import type { DidCreateResult, DidDocument } from '@credo-ts/core'
 import {
   DidDocumentBuilder,
   DidDocumentService,
+  TypedArrayEncoder,
   VERIFICATION_METHOD_TYPE_ECDSA_SECP256K1_VERIFICATION_KEY_2019,
 } from '@credo-ts/core'
 import type { PublicJwk, Secp256k1PublicJwk } from '@credo-ts/core/kms'
@@ -16,12 +17,12 @@ import { getCompressedEcdsaSecp256k1VerificationKey2019 } from '../utils'
  * Uses compressed SEC1 format (33 bytes: prefix 02/03 + X coordinate).
  */
 export function createSecp256k1PublicJwk(publicJwk: { x: string; y: string }): Secp256k1PublicJwk {
-  const xBytes = Buffer.from(publicJwk.x, 'base64url')
-  const yBytes = Buffer.from(publicJwk.y, 'base64url')
+  const xBytes = TypedArrayEncoder.fromBase64Url(publicJwk.x)
+  const yBytes = TypedArrayEncoder.fromBase64Url(publicJwk.y)
   const prefix = yBytes[yBytes.length - 1] % 2 === 0 ? '02' : '03'
-  const compressedKeyHex = prefix + xBytes.toString('hex')
+  const compressedKeyHex = prefix + TypedArrayEncoder.toHex(xBytes)
 
-  return Secp256k1PublicJwkClass.fromPublicKey(Buffer.from(compressedKeyHex, 'hex'))
+  return Secp256k1PublicJwkClass.fromPublicKey(TypedArrayEncoder.fromHex(compressedKeyHex))
 }
 
 export const polygonDidRegex = new RegExp(/^did:polygon(:testnet)?:0x[0-9a-fA-F]{40}$/)

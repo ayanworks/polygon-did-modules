@@ -13,6 +13,14 @@ import { isValidPolygonDid } from './didPolygonUtil'
 export class PolygonDidResolver implements DidResolver {
   public readonly allowsCaching = true
 
+  /**
+   * Serve DIDs this agent has created or imported from its own DID repository
+   * instead of going to the chain. Without this, resolving a locally-known DID
+   * always costs an RPC round trip - and fails outright when the node is
+   * unreachable, even though the document is already held locally.
+   */
+  public readonly allowsLocalDidRecord = true
+
   private resolver?: Resolver
 
   public readonly supportedMethods = ['polygon']

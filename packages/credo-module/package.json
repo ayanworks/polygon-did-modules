@@ -31,8 +31,8 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@credo-ts/askar": "^0.6.1",
-    "@credo-ts/core": "^0.6.1",
+    "@credo-ts/askar": "^0.7.2",
+    "@credo-ts/core": "^0.7.2",
     "@ayanworks/polygon-did-registrar": "workspace:*",
     "@ayanworks/polygon-did-resolver": "workspace:*",
     "@ayanworks/polygon-schema-manager": "workspace:*",
@@ -40,8 +40,8 @@
     "ethers": "catalog:"
   },
   "devDependencies": {
-    "@credo-ts/node": "^0.6.1",
-    "@credo-ts/didcomm": "^0.6.1",
+    "@credo-ts/node": "^0.7.2",
+    "@credo-ts/didcomm": "^0.7.2",
     "@openwallet-foundation/askar-nodejs": "0.6.0",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",

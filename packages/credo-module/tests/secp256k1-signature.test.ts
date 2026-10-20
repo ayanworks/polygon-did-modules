@@ -4,7 +4,6 @@ import {
   Agent,
   ClaimFormat,
   ConsoleLogger,
-  CredentialIssuancePurpose,
   CredoError,
   DidsModule,
   JsonTransformer,
@@ -31,12 +30,20 @@ import { buildDid } from '../src/dids/didPolygonUtil'
 import { PolygonModule } from '../src/PolygonModule'
 import { EcdsaSecp256k1Signature2019 } from '../src/signature-suites'
 import { customDocumentLoader } from './documentLoader'
-import { EcdsaSecp256k1Signature2019Fixtures } from './fixtures'
+import {
+  EcdsaSecp256k1Signature2019Fixtures,
+  TEST_ISSUER_DID,
+  TEST_PRIVATE_KEY_HEX,
+  TEST_VERIFICATION_METHOD,
+} from './fixtures'
 
-const logger = new ConsoleLogger(LogLevel.info)
+const logger = new ConsoleLogger(LogLevel.Info)
 
 const { jsonldSignatures } = vcLibraries
 const { purposes } = jsonldSignatures
+
+const CHALLENGE = '7bf32d0b-39d4-41f3-96b6-45de52988e4c'
+const DOMAIN = 'issuer.example.com'
 
 const signatureSuiteRegistry = new SignatureSuiteRegistry([
   {
@@ -54,6 +61,22 @@ const w3cJsonLdCredentialService = new W3cJsonLdCredentialService(
   })
 )
 
+/** Serialise a signed credential/presentation back to plain JSON so it can be re-parsed. */
+const toJson = (value: unknown): Record<string, unknown> => JSON.parse(JSON.stringify(value))
+
+/**
+ * Flip the last character of the detached JWS signature. The signature no longer
+ * matches the payload, so verification must fail for the signature and not for
+ * some unrelated reason such as an unresolvable verification method.
+ */
+const tamperWithJws = <T extends { proof: unknown }>(document: T): T => {
+  const json = toJson(document) as T & { proof: { jws: string } | Array<{ jws: string }> }
+  const proof = Array.isArray(json.proof) ? json.proof[0] : json.proof
+  proof.jws = `${proof.jws.slice(0, -1)}${proof.jws.endsWith('A') ? 'B' : 'A'}`
+
+  return json as unknown as T
+}
+
 describe('Secp256k1 W3cCredentialService', () => {
   let agent: Agent<{ askar: AskarModule; polygon: PolygonModule; dids: DidsModule }>
 
@@ -68,9 +91,16 @@ describe('Secp256k1 W3cCredentialService', () => {
   })
 
   describe('EcdsaSecp256k1Signature2019', () => {
-    const privateKey = TypedArrayEncoder.fromHex('5a4a2c79f4bceb4976dde41897b2607e01e6b74a42bc854a7a20059cfa99a095')
     let issuerDid: string
     let verificationMethod: string
+
+    // Signed at runtime rather than checked in. The previous hardcoded fixtures
+    // were signed by the holder of a live on-chain DID and carried the invalid
+    // `alg: "EcDSA"` JWS header, so they could neither be regenerated here nor
+    // verified by Credo 0.7. Signing with the deterministic test key keeps the
+    // suite self-contained.
+    let signedCredential: W3cJsonLdVerifiableCredential
+    let signedPresentation: W3cJsonLdVerifiablePresentation
 
     beforeAll(async () => {
       agent = new Agent({
@@ -102,10 +132,17 @@ describe('Secp256k1 W3cCredentialService', () => {
       })
       await agent.initialize()
 
+      const privateKey = TypedArrayEncoder.fromHex(TEST_PRIVATE_KEY_HEX)
       const signingKey = new SigningKey(privateKey)
-      const publicKeyHex = signingKey.compressedPublicKey.substring(2) // Remove '0x' prefix
-      const publicKeyBuffer = Buffer.from(publicKeyHex, 'hex')
-      const publicKeyBase58 = TypedArrayEncoder.toBase58(publicKeyBuffer)
+      // x || y, uncompressed and without the SEC1 prefix. This is what
+      // PolygonDidRegistrar passes to buildDid, and using the x-coordinate alone
+      // would derive a different address.
+      const publicKeyHex = signingKey.publicKey.substring(2)
+      // The KMS key id is base58 of the 32-byte x-coordinate, matching
+      // PolygonDidRegistrar.importKeyToKms.
+      const publicKeyBase58 = TypedArrayEncoder.toBase58(
+        TypedArrayEncoder.fromHex(signingKey.compressedPublicKey.substring(2))
+      )
 
       const { privateJwk } = transformPrivateKeyToPrivateJwk({
         type: { kty: 'EC', crv: 'secp256k1' },
@@ -118,6 +155,8 @@ describe('Secp256k1 W3cCredentialService', () => {
       })
 
       issuerDid = buildDid('polygon', 'testnet', publicKeyHex)
+      // Guard against the fixtures drifting away from the key used here.
+      expect(issuerDid).toBe(TEST_ISSUER_DID)
 
       await agent.dids.import({
         did: issuerDid,
@@ -131,6 +170,42 @@ describe('Secp256k1 W3cCredentialService', () => {
       })
 
       verificationMethod = `${issuerDid}#key-1`
+      expect(verificationMethod).toBe(TEST_VERIFICATION_METHOD)
+
+      const credentialJson = {
+        ...EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT,
+        issuer: issuerDid,
+      }
+      const { id: _id, ...credentialSubject } = credentialJson.credentialSubject as Record<string, unknown>
+      credentialJson.credentialSubject = credentialSubject
+
+      const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
+
+      signedCredential = await w3cJsonLdCredentialService.signCredential(agent.context, {
+        format: ClaimFormat.LdpVc,
+        credential,
+        proofType: 'EcdsaSecp256k1Signature2019',
+        verificationMethod,
+      })
+
+      const presentation = JsonTransformer.fromJSON(
+        {
+          ...EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT,
+          verifiableCredential: [signedCredential],
+        },
+        W3cPresentation
+      )
+      signedPresentation = await w3cJsonLdCredentialService.signPresentation(agent.context, {
+        format: ClaimFormat.LdpVp,
+        presentation,
+        // verifyPresentation treats the holder proof as an authentication proof
+        // unless told otherwise, so sign it with a matching purpose.
+        proofPurpose: new purposes.AuthenticationProofPurpose({ challenge: CHALLENGE, domain: DOMAIN }),
+        proofType: 'EcdsaSecp256k1Signature2019',
+        challenge: CHALLENGE,
+        domain: DOMAIN,
+        verificationMethod,
+      })
     })
 
     afterAll(async () => {
@@ -141,65 +216,60 @@ describe('Secp256k1 W3cCredentialService', () => {
 
     describe('signCredential', () => {
       it('should return a successfully signed credential secp256k1', async () => {
-        const credentialJson = EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT
-        credentialJson.issuer = issuerDid
-
-        const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
-
-        const vc = await w3cJsonLdCredentialService.signCredential(agent.context, {
-          format: ClaimFormat.LdpVc,
-          credential,
-          proofType: 'EcdsaSecp256k1Signature2019',
-          verificationMethod: verificationMethod,
-        })
+        const vc = signedCredential
 
         expect(vc).toBeInstanceOf(W3cJsonLdVerifiableCredential)
         expect(vc.issuer).toEqual(issuerDid)
         expect(Array.isArray(vc.proof)).toBe(false)
-        // expect(vc.proof).toBeInstanceOf(LinkedDataProof)
-
-        // vc.proof = vc.proof as LinkedDataProof
-        // expect(vc.proof.verificationMethod).toEqual(verificationMethod)
+        // The suite must emit the registered JWA identifier, not the legacy 'EcDSA'.
+        expect(toJson(vc).proof).toMatchObject({ type: 'EcdsaSecp256k1Signature2019' })
+        const [header] = (toJson(vc).proof as { jws: string }).jws.split('..')
+        expect(JSON.parse(Buffer.from(header, 'base64url').toString('utf8'))).toMatchObject({ alg: 'ES256K' })
       })
 
       it('should throw because of verificationMethod does not belong to this wallet', async () => {
-        const credentialJson = EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT
-        credentialJson.issuer = issuerDid
-
+        const credentialJson = { ...EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT, issuer: issuerDid }
         const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
 
-        expect(async () => {
-          await w3cJsonLdCredentialService.signCredential(agent.context, {
+        await expect(
+          w3cJsonLdCredentialService.signCredential(agent.context, {
             format: ClaimFormat.LdpVc,
             credential,
             proofType: 'EcdsaSecp256k1Signature2019',
             verificationMethod: 'did:polygon:testnet:0x4A09b8CB511cca4Ca1c5dB0475D0e07bFc96EF47#key-1',
           })
-        }).rejects.toThrowError(CredoError)
+        ).rejects.toThrowError(CredoError)
       })
     })
 
     describe('verifyCredential', () => {
       it('should verify the credential successfully', async () => {
         const result = await w3cJsonLdCredentialService.verifyCredential(agent.context, {
-          credential: JsonTransformer.fromJSON(
-            EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT_SIGNED,
-            W3cJsonLdVerifiableCredential
-          ),
+          credential: JsonTransformer.fromJSON(signedCredential, W3cJsonLdVerifiableCredential),
           proofPurpose: new purposes.AssertionProofPurpose(),
         })
 
-        expect(result.isValid).toEqual(true)
+        expect(result).toMatchObject({
+          isValid: true,
+          error: undefined,
+          validations: {
+            vcJs: {
+              isValid: true,
+              results: expect.any(Array),
+            },
+          },
+        })
       })
 
       it('should fail because of invalid signature', async () => {
         const vc = JsonTransformer.fromJSON(
-          EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT_BAD_SIGNED,
+          tamperWithJws(signedCredential),
           W3cJsonLdVerifiableCredential
-        )
+        ) as W3cJsonLdVerifiableCredential
+
         const result = await w3cJsonLdCredentialService.verifyCredential(agent.context, { credential: vc })
 
-        expect(result).toEqual({
+        expect(result).toMatchObject({
           isValid: false,
           error: expect.any(Error),
           validations: {
@@ -215,45 +285,21 @@ describe('Secp256k1 W3cCredentialService', () => {
 
     describe('signPresentation', () => {
       it('should successfully create a presentation from single verifiable credential', async () => {
-        const presentation = JsonTransformer.fromJSON(
-          EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT,
-          W3cPresentation
-        )
-
-        const purpose = new CredentialIssuancePurpose({
-          controller: {
-            id: verificationMethod,
-          },
-          date: new Date().toISOString(),
-        })
-
-        const verifiablePresentation = await w3cJsonLdCredentialService.signPresentation(agent.context, {
-          format: ClaimFormat.LdpVp,
-          presentation: presentation,
-          proofPurpose: purpose,
-          proofType: 'EcdsaSecp256k1Signature2019',
-          challenge: '7bf32d0b-39d4-41f3-96b6-45de52988e4c',
-          domain: 'issuer.example.com',
-          verificationMethod: verificationMethod,
-        })
-
-        expect(verifiablePresentation).toBeInstanceOf(W3cJsonLdVerifiablePresentation)
+        expect(signedPresentation).toBeInstanceOf(W3cJsonLdVerifiablePresentation)
+        expect(toJson(signedPresentation).verifiableCredential).toBeDefined()
       })
     })
 
     describe('verifyPresentation', () => {
       it('should successfully verify a presentation containing a single verifiable credential', async () => {
-        const vp = JsonTransformer.fromJSON(
-          EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED,
-          W3cJsonLdVerifiablePresentation
-        )
+        const vp = JsonTransformer.fromJSON(signedPresentation, W3cJsonLdVerifiablePresentation)
 
         const result = await w3cJsonLdCredentialService.verifyPresentation(agent.context, {
           presentation: vp,
-          challenge: '7bf32d0b-39d4-41f3-96b6-45de52988e4c',
+          challenge: CHALLENGE,
         })
 
-        expect(result).toEqual({
+        expect(result).toMatchObject({
           isValid: true,
           error: undefined,
           validations: {
@@ -268,22 +314,16 @@ describe('Secp256k1 W3cCredentialService', () => {
 
       it('should fail when presentation signature is not valid', async () => {
         const vp = JsonTransformer.fromJSON(
-          {
-            ...EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED,
-            proof: {
-              ...EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED.proof,
-              jws: `${EcdsaSecp256k1Signature2019Fixtures.TEST_VP_DOCUMENT_SIGNED.proof.jws}a`,
-            },
-          },
+          tamperWithJws(signedPresentation),
           W3cJsonLdVerifiablePresentation
-        )
+        ) as W3cJsonLdVerifiablePresentation
 
         const result = await w3cJsonLdCredentialService.verifyPresentation(agent.context, {
           presentation: vp,
-          challenge: '7bf32d0b-39d4-41f3-96b6-45de52988e4c',
+          challenge: CHALLENGE,
         })
 
-        expect(result).toEqual({
+        expect(result).toMatchObject({
           isValid: false,
           error: expect.any(Error),
           validations: {

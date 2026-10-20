@@ -157,7 +157,52 @@
 
     <section class="card">
       <div class="card-head">
-        <h2>6. All endpoints</h2>
+        <h2>6. Credo Module - Schema operations</h2>
+        <p class="hint">Use the <code>@ayanworks/credo-polygon-w3c-module</code> (Credo framework integration) to create and fetch schemas on Polygon.</p>
+      </div>
+      <div class="row">
+        <label class="field inline">
+          <span>Schema name</span>
+          <input id="schema-name" type="text" spellcheck="false" placeholder="TestSchema">
+        </label>
+      </div>
+      <label class="field">
+        <span>Schema JSON</span>
+        <textarea id="schema-json" rows="10" spellcheck="false">{
+  "@context": [
+    { "@version": 1.1 },
+    "https://www.w3.org/ns/odrl.jsonld",
+    {
+      "ex": "https://example.org/examples#",
+      "schema": "http://schema.org/",
+      "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+      "name": "schema:name",
+      "degree": "ex:degree",
+      "degreeType": "ex:degreeType"
+    }
+  ]
+}</textarea>
+      </label>
+      <div class="row">
+        <button id="run-create-schema">Create schema via Credo module</button>
+      </div>
+      <p class="hint small">Uses your identity's private key and DID above. The schema is created via the Credo agent using the Polygon module.</p>
+      <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;">
+      <div class="row">
+        <label class="field inline">
+          <span>Schema ID</span>
+          <input id="schema-id" type="text" spellcheck="false" placeholder="uuid">
+        </label>
+      </div>
+      <div class="row">
+        <button id="run-get-schema">Get schema by DID and ID</button>
+      </div>
+      <pre id="schema-result" class="result" hidden></pre>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>7. All endpoints</h2>
         <p class="hint">Every route the API exposes, with an editable request body where it applies.</p>
       </div>
       <div id="endpoint-list" class="endpoints"></div>

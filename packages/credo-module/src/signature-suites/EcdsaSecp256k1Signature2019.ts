@@ -1,6 +1,7 @@
 import type { DocumentLoader, JwsLinkedDataSignatureOptions, Proof } from '@credo-ts/core'
 
 import { CREDENTIALS_CONTEXT_V1_URL, JwsLinkedDataSignature, SECURITY_CONTEXT_URL, vcLibraries } from '@credo-ts/core'
+import { KnownJwaSignatureAlgorithms } from '@credo-ts/core/kms'
 
 const { jsonld } = vcLibraries
 
@@ -55,7 +56,10 @@ export class EcdsaSecp256k1Signature2019 extends JwsLinkedDataSignature {
   public constructor(options: EcdsaSecp256k1Signature2019Options) {
     super({
       type: 'EcdsaSecp256k1Signature2019',
-      algorithm: 'EcDSA',
+      // 'ES256K' is the registered JWA identifier for ECDSA over secp256k1 with
+      // SHA-256. Credo 0.7 rejects an unknown `alg` against the key's supported
+      // algorithms, and 'EcDSA' - used here previously - is not a JWA name.
+      algorithm: KnownJwaSignatureAlgorithms.ES256K,
       LDKeyClass: options.LDKeyClass,
       contextUrl: SECURITY_CONTEXT_SECP256k1_URL,
       key: options.key,

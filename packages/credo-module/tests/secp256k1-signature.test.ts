@@ -176,8 +176,10 @@ describe('Secp256k1 W3cCredentialService', () => {
         ...EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT,
         issuer: issuerDid,
       }
-      const { id: _id, ...credentialSubject } = credentialJson.credentialSubject as Record<string, unknown>
-      credentialJson.credentialSubject = credentialSubject
+      const credentialSubject = { ...(credentialJson.credentialSubject as Record<string, unknown>) }
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete (credentialSubject as Record<string, unknown>).id
+      credentialJson.credentialSubject = credentialSubject as any
 
       const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
 

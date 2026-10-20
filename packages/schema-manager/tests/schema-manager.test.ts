@@ -31,7 +31,7 @@ describe('Schema Manager', () => {
     registeredSchemaDetails = await polygonSchemaManager.createSchema(testDidDetails.did, 'PAN CARD', testSchemaSample)
   })
 
-  let registeredSchemaDetails: unknown
+  let registeredSchemaDetails: any
 
   it.skip('should get transaction hash after registering schema with non-empty and non-null values for both schemaTxnReceipt and resourceTxnReceipt', async () => {
     assert.ok(registeredSchemaDetails?.txnReceipt?.schemaTxnReceipt)

@@ -7,13 +7,13 @@ overrides:
   vite: npm:rolldown-vite@latest
 
 catalog:
-  '@biomejs/biome': ^2.3.13
+  '@biomejs/biome': ^2.6.2
   '@nomicfoundation/hardhat-ethers': ^3.0.8
   '@nomicfoundation/hardhat-verify': ^2.0.12
   '@openzeppelin/hardhat-upgrades': ^3.6.0
   '@types/node': ^20.19.25
   did-resolver: ^4.1.0
-  ethers: ^6.16.0
+  ethers: ^6.17.0
   hardhat: ^2.22.0
   ts-node: ^10.9.2
   typescript: ~5.9.3

@@ -9,7 +9,7 @@ overrides:
 catalog:
   '@biomejs/biome': ^2.3.13
   '@nomicfoundation/hardhat-ethers': ^3.0.8
-  '@nomicfoundation/hardhat-verify': ^2.0.12
+  '@nomicfoundation/hardhat-verify': ^3.1.4
   '@openzeppelin/hardhat-upgrades': ^3.6.0
   '@types/node': ^20.19.25
   did-resolver: ^4.1.0

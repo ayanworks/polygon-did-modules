@@ -21,7 +21,7 @@
     "@biomejs/biome": "catalog:",
     "@changesets/cli": "^2.29.8",
     "@types/node": "catalog:",
-    "tsdown": "^0.20.1",
+    "tsdown": "^0.23.1",
     "typescript": "catalog:",
     "vite": "npm:rolldown-vite@^7.3.1",
     "vite-node": "^5.3.0",

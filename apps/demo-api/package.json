@@ -29,14 +29,14 @@
     "did-resolver": "catalog:",
     "dotenv": "^18.0.8",
     "ethers": "catalog:",
-    "express": "^4.22.3",
+    "express": "^5.3.0",
     "log4js": "^6.9.1",
     "swagger-ui-express": "^5.0.1",
     "uuid": "catalog:"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.25",
+    "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/supertest": "^7.2.1",

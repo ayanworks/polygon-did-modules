@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@credo-ts/node": "^0.7.2",
-    "@credo-ts/didcomm": "^0.7.2",
+    "@credo-ts/didcomm": "^0.7.4",
     "@openwallet-foundation/askar-nodejs": "0.6.0",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",

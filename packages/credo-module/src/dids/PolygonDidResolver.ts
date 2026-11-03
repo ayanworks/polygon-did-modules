@@ -34,10 +34,18 @@ export class PolygonDidResolver implements DidResolver {
     try {
       const resolver = this._getResolver(agentContext)
       const { didDocument, didDocumentMetadata, didResolutionMetadata } = await resolver.resolve(did)
+      const { equivalentId, ...metadata } = didDocumentMetadata
 
       return {
         didDocument: JsonTransformer.fromJSON(didDocument, DidDocument),
-        didDocumentMetadata,
+        didDocumentMetadata: {
+          ...metadata,
+          // Credo still types equivalentId as a single string (did-resolver v4),
+          // while did-resolver v6 allows an array. Normalise at the boundary.
+          ...(equivalentId === undefined
+            ? {}
+            : { equivalentId: Array.isArray(equivalentId) ? equivalentId.join(' ') : equivalentId }),
+        },
         didResolutionMetadata,
       }
     } catch (error) {

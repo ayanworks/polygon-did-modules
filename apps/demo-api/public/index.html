@@ -42,8 +42,8 @@
         <p class="hint">A key pair and DID document that the rest of the page operates on. Generate one, or paste your own to reuse.</p>
       </div>
       <div class="row">
-        <button id="generate">Generate a new identity</button>
-        <button id="load-sample" class="ghost">Load the on-chain sample</button>
+        <button type="button" id="generate">Generate a new identity</button>
+        <button type="button" id="load-sample" class="ghost">Load the on-chain sample</button>
       </div>
       <label class="field">
         <span>DID</span>
@@ -54,8 +54,8 @@
         <input id="privateKey" type="password" spellcheck="false" placeholder="0x...">
       </label>
       <div class="row">
-        <button id="reveal" class="ghost small">Reveal key</button>
-        <button id="copy-key" class="ghost small">Copy key</button>
+        <button type="button" id="reveal" class="ghost small">Reveal key</button>
+        <button type="button" id="copy-key" class="ghost small">Copy key</button>
       </div>
       <div id="identity-meta" class="meta"></div>
     </section>
@@ -66,8 +66,8 @@
         <p class="hint">The document registered on chain. Edit it inline to see updates take effect.</p>
       </div>
       <div class="row">
-        <button id="build-doc" class="ghost small">Rebuild from the current key</button>
-        <button id="copy-doc" class="ghost small">Copy JSON</button>
+        <button type="button" id="build-doc" class="ghost small">Rebuild from the current key</button>
+        <button type="button" id="copy-doc" class="ghost small">Copy JSON</button>
       </div>
       <textarea id="didDoc" rows="14" spellcheck="false"></textarea>
     </section>
@@ -88,11 +88,11 @@
             <option value="update">update (replace the stored document)</option>
           </select>
         </label>
-        <button id="signer-local">Signer: in-browser key</button>
-        <button id="signer-wallet" class="ghost">Signer: wallet (MetaMask)</button>
+        <button type="button" id="signer-local">Signer: in-browser key</button>
+        <button type="button" id="signer-wallet" class="ghost">Signer: wallet (MetaMask)</button>
       </div>
       <div class="row">
-        <button id="run-keyless" class="primary">Run keyless flow (intent → sign → broadcast)</button>
+        <button type="button" id="run-keyless" class="primary">Run keyless flow (intent → sign → broadcast)</button>
       </div>
       <ol id="keyless-steps" class="steps">
         <li id="step-intent" data-label="POST /tx-intent - not started" data-state="idle">POST /tx-intent - not started</li>
@@ -113,13 +113,13 @@
         <div class="funding-address">
           <span class="funding-label">Fund this address</span>
           <code id="funding-address">-</code>
-          <button id="copy-address" class="ghost small">Copy</button>
+          <button type="button" id="copy-address" class="ghost small">Copy</button>
         </div>
         <div class="row">
           <a class="btn-link" id="faucet-link" href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">
             Open the Polygon faucet ↗
           </a>
-          <button id="retry-keyless" class="ghost small">I funded it — run again</button>
+          <button type="button" id="retry-keyless" class="ghost small">I funded it — run again</button>
         </div>
         <p class="hint small">
           Faucets give one drip per address per day and can take a minute to land. Any gas-free drip works;
@@ -134,7 +134,7 @@
         <p class="hint">Read the document back from the chain. Works for any DID, including the sample.</p>
       </div>
       <div class="row">
-        <button id="run-resolve">Resolve the DID above</button>
+        <button type="button" id="run-resolve">Resolve the DID above</button>
       </div>
     </section>
 
@@ -147,8 +147,8 @@
         </p>
       </div>
       <div class="row">
-        <button id="run-register" class="warnbtn">POST /register-did</button>
-        <button id="run-update" class="warnbtn">PATCH /update-did/:did</button>
+        <button type="button" id="run-register" class="warnbtn">POST /register-did</button>
+        <button type="button" id="run-update" class="warnbtn">PATCH /update-did/:did</button>
       </div>
       <p class="hint small">Requires the address to hold a little Amoy POL. Get some at
         <a class="link" href="https://faucet.polygon.technology/" target="_blank" rel="noreferrer">faucet.polygon.technology ↗</a>.
@@ -184,7 +184,7 @@
 }</textarea>
       </label>
       <div class="row">
-        <button id="run-create-schema">Create schema via Credo module</button>
+        <button type="button" id="run-create-schema">Create schema via Credo module</button>
       </div>
       <p class="hint small">Uses your identity's private key and DID above. The schema is created via the Credo agent using the Polygon module.</p>
       <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:16px 0;">
@@ -195,7 +195,7 @@
         </label>
       </div>
       <div class="row">
-        <button id="run-get-schema">Get schema by DID and ID</button>
+        <button type="button" id="run-get-schema">Get schema by DID and ID</button>
       </div>
       <pre id="schema-result" class="result" hidden></pre>
     </section>
@@ -214,7 +214,7 @@
         <p class="hint">Every call this page makes, with the exact payload and response. Copy any of them as curl.</p>
       </div>
       <div class="row">
-        <button id="clear-log" class="ghost small">Clear</button>
+        <button type="button" id="clear-log" class="ghost small">Clear</button>
       </div>
       <div id="log" class="log"></div>
     </section>

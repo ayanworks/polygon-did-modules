@@ -1,5 +1,15 @@
 # @ayanworks/credo-polygon-w3c-module
 
+## 2.1.2
+
+### Patch Changes
+
+- Updated dependencies [2eb0b65]
+- Updated dependencies [710d593]
+  - @ayanworks/polygon-did-resolver@1.1.0
+  - @ayanworks/polygon-did-registrar@3.0.0
+  - @ayanworks/polygon-schema-manager@2.2.3
+
 ## 2.1.1
 
 ### Patch Changes

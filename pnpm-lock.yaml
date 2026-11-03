@@ -22,8 +22,8 @@ catalogs:
       specifier: ^22.20.5
       version: 22.20.5
     did-resolver:
-      specifier: ^4.1.0
-      version: 4.1.0
+      specifier: ^6.0.0
+      version: 6.0.0
     ethers:
       specifier: ^6.17.0
       version: 6.17.0
@@ -119,7 +119,7 @@ importers:
         version: 2.8.6
       did-resolver:
         specifier: 'catalog:'
-        version: 4.1.0
+        version: 6.0.0
       dotenv:
         specifier: ^18.0.9
         version: 18.0.9
@@ -186,7 +186,7 @@ importers:
         version: 0.7.4(typescript@5.9.3)
       did-resolver:
         specifier: 'catalog:'
-        version: 4.1.0
+        version: 6.0.0
       ethers:
         specifier: 'catalog:'
         version: 6.17.0
@@ -238,7 +238,7 @@ importers:
         version: 5.8.0
       did-resolver:
         specifier: 'catalog:'
-        version: 4.1.0
+        version: 6.0.0
       ethers:
         specifier: 'catalog:'
         version: 6.17.0
@@ -290,7 +290,7 @@ importers:
         version: link:../did-registry-contract
       did-resolver:
         specifier: 'catalog:'
-        version: 4.1.0
+        version: 6.0.0
       ethers:
         specifier: 'catalog:'
         version: 6.17.0
@@ -318,7 +318,7 @@ importers:
         version: 1.21.0(debug@4.4.3)
       did-resolver:
         specifier: 'catalog:'
-        version: 4.1.0
+        version: 6.0.0
       ethers:
         specifier: 'catalog:'
         version: 6.17.0
@@ -1827,6 +1827,7 @@ packages:
 
   '@sphereon/kmp-mdoc-core@0.2.0-SNAPSHOT.26':
     resolution: {integrity: sha512-QXJ6R8ENiZV2rPMbn06cw5JKwqUYN1kzVRbYfONqE1PEXx1noQ4md7uxr2zSczi0ubKkNcbyYDNtIMTZIhGzmQ==}
+    bundledDependencies: []
 
   '@sphereon/pex-models@2.3.2':
     resolution: {integrity: sha512-foFxfLkRwcn/MOp/eht46Q7wsvpQGlO7aowowIIb5Tz9u97kYZ2kz6K2h2ODxWuv5CRA7Q0MY8XUBGE2lfOhOQ==}
@@ -2485,6 +2486,9 @@ packages:
 
   did-resolver@4.1.0:
     resolution: {integrity: sha512-S6fWHvCXkZg2IhS4RcVHxwuyVejPR7c+a4Go0xbQ9ps5kILa8viiYQgrM4gfTyeTjJ0ekgJH9gk/BawTpmkbZA==}
+
+  did-resolver@6.0.0:
+    resolution: {integrity: sha512-qYlNpucsgfBE0foIqlnEjLx7ZvMTUOkPeIjOhVKPJKm4h8afFNS78zDLbiJPZ2yvY3Z7C79FW1UHSRyehRCpOg==}
 
   diff@4.0.4:
     resolution: {integrity: sha512-X07nttJQkwkfKfvTPG/KSnE2OMdcUCao6+eXF3wmnIQRn2aPAHH3VxDbDOdegkd6JbPsXqShpvEOHfAT+nCNwQ==}
@@ -7264,6 +7268,8 @@ snapshots:
       wrappy: 1.0.2
 
   did-resolver@4.1.0: {}
+
+  did-resolver@6.0.0: {}
 
   diff@4.0.4: {}
 

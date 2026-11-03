@@ -324,7 +324,7 @@ export class PolygonDID {
       const gasPriceDetails = await provider.getFeeData()
 
       // Check if gas price details are available
-      if (!gasPriceDetails || !gasPriceDetails.gasPrice) {
+      if (!gasPriceDetails?.gasPrice) {
         throw new Error('Gas price details not found!')
       }
 

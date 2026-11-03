@@ -176,10 +176,10 @@ describe('Secp256k1 W3cCredentialService', () => {
         ...EcdsaSecp256k1Signature2019Fixtures.TEST_LD_DOCUMENT,
         issuer: issuerDid,
       }
-      const credentialSubject = { ...(credentialJson.credentialSubject as Record<string, unknown>) }
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      const credentialSubject = { ...credentialJson.credentialSubject }
+      // biome-ignore lint/performance/noDelete: the credential subject must not carry the fixture's id
       delete (credentialSubject as Record<string, unknown>).id
-      credentialJson.credentialSubject = credentialSubject as any
+      credentialJson.credentialSubject = credentialSubject
 
       const credential = JsonTransformer.fromJSON(credentialJson, W3cCredential)
 

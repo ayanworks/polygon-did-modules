@@ -129,6 +129,24 @@ describe('route table', () => {
     expect(broadcast.status).toBe(201)
   })
 
+  it('decodes percent-encoded route parameters', async () => {
+    // Express 5 routes through path-to-regexp v8; keep the DID segment decoding
+    // behaviour that clients rely on when they URL-encode the colons.
+    // Use a DID this suite has not resolved yet - the route-level Resolver caches.
+    const encodedDid = 'did:polygon:testnet:0x6666666666666666666666666666666666666666'
+    mocks.resolve.mockResolvedValue({
+      didDocument: { id: encodedDid },
+      didDocumentMetadata: {},
+      didResolutionMetadata: { contentType: 'application/did+ld+json' },
+    })
+
+    const res = await request(app).get(`/resolve-did/${encodeURIComponent(encodedDid)}`)
+
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ id: encodedDid })
+    expect(mocks.resolve).toHaveBeenCalledWith(encodedDid)
+  })
+
   it('no longer exposes the removed delete endpoint', async () => {
     const res = await request(app).delete(`/delete-did/${TEST_DID}/${TEST_PRIVATE_KEY}`)
     expect(res.status).toBe(404)

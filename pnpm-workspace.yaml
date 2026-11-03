@@ -8,7 +8,7 @@ overrides:
 
 catalog:
   "@biomejs/biome": ^2.6.4
-  "@nomicfoundation/hardhat-ethers": ^3.0.8
+  "@nomicfoundation/hardhat-ethers": ^4.2.2
   "@nomicfoundation/hardhat-verify": ^2.0.12
   "@openzeppelin/hardhat-upgrades": ^3.6.0
   "@types/node": ^22.20.5

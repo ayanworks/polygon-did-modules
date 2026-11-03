@@ -35,21 +35,23 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          title: "chore(release): new version"
-          commit: "chore(release): new version"
-          publish: pnpm release
-          version: pnpm changeset-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-title: "chore(release): new version"
+          commit-message: "chore(release): new version"
+          publish-script: pnpm release
+          version-script: pnpm changeset-version
+          # Tags and GitHub releases are created by the manual step below.
+          push-git-tags: false
+          create-github-releases: false
 
       - name: Create Github Releases
         if: steps.changesets.outputs.published == 'true'
         uses: actions/github-script@v9
         with:
           script: |
-            const publishedPackages = ${{ steps.changesets.outputs.publishedPackages }};
+            const publishedPackages = ${{ steps.changesets.outputs.published-packages }};
             for (const pkg of publishedPackages) {
               // @ayanworks/polygon-did-resolver -> polygon-did-resolver
               const shortName = pkg.name.replace(/^@ayanworks\//, '');
@@ -118,7 +120,8 @@ jobs:
 
           pnpm changeset version --snapshot ${{ env.TAG }}
           pnpm build
-          pnpm changeset publish --tag ${{ env.TAG }}
+          # Tags are created per package below; let Changesets skip its own.
+          pnpm changeset publish --tag ${{ env.TAG }} --no-git-tag
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"

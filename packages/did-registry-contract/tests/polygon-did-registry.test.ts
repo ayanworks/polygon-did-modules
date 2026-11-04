@@ -1,5 +1,6 @@
+import { upgrades as upgradesFactory } from '@openzeppelin/hardhat-upgrades'
 import type { Contract } from 'ethers'
-import { ethers, upgrades } from 'hardhat'
+import hre, { network } from 'hardhat'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 let contract: Contract
@@ -33,6 +34,10 @@ const updatedDidDoc = JSON.stringify({
 
 describe('PolygonDidRegistry', () => {
   beforeAll(async () => {
+    const connection = await network.create()
+    const { ethers } = connection
+    const upgrades = await upgradesFactory(hre, connection)
+
     const [signer] = await ethers.getSigners()
     signerAddress = signer.address
 

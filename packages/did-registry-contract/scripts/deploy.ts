@@ -1,8 +1,14 @@
-import { ethers, upgrades } from 'hardhat'
+import { upgrades as upgradesFactory } from '@openzeppelin/hardhat-upgrades'
+import hre from 'hardhat'
 
 async function main() {
   // biome-ignore lint/suspicious/noConsole: deploy script output
   console.log('Deploying the smart contract...')
+
+  const connection = await hre.network.create()
+  const { ethers } = connection
+  const upgrades = await upgradesFactory(hre, connection)
+
   const PolygonDidRegistry = await ethers.getContractFactory('PolygonDidRegistry')
   const contract = await upgrades.deployProxy(PolygonDidRegistry, { initializer: 'initialize' })
   await contract.waitForDeployment()

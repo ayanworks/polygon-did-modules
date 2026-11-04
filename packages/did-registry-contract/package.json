@@ -1,6 +1,7 @@
 {
   "name": "@ayanworks/polygon-did-registry-contract",
   "version": "4.0.1",
+  "type": "module",
   "description": "Smart Contract to register DID on Polygon",
   "files": [
     "build"
@@ -39,7 +40,6 @@
     "@types/node": "catalog:",
     "ethers": "catalog:",
     "hardhat": "catalog:",
-    "ts-node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

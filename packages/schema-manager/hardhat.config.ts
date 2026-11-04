@@ -1,23 +1,24 @@
-import '@nomicfoundation/hardhat-ethers'
-import '@openzeppelin/hardhat-upgrades'
-import '@nomicfoundation/hardhat-verify'
-import type { HardhatUserConfig } from 'hardhat/config'
+import hardhatEthers from '@nomicfoundation/hardhat-ethers'
+import hardhatVerify from '@nomicfoundation/hardhat-verify'
+import hardhatUpgrades from '@openzeppelin/hardhat-upgrades'
+import { configVariable, defineConfig } from 'hardhat/config'
 
-const config: HardhatUserConfig = {
+export default defineConfig({
+  plugins: [hardhatEthers, hardhatVerify, hardhatUpgrades],
   solidity: {
     version: '0.8.16',
     settings: { optimizer: { enabled: true, runs: 200 } },
   },
   networks: {
-    hardhat: {},
+    // `default` is Hardhat's built-in simulated network, so only the live
+    // Polygon Amoy network needs to be declared.
     amoy: {
-      url: process.env.AMOY_RPCURL || '',
+      type: 'http',
+      url: configVariable('AMOY_RPCURL'),
       accounts: process.env.SIGNER_TESTNET ? [`0x${process.env.SIGNER_TESTNET}`] : [],
     },
   },
-  etherscan: {
-    apiKey: { polygonAmoy: process.env.VERIFICATION_KEY || '' },
+  verify: {
+    etherscan: { apiKey: process.env.VERIFICATION_KEY || '' },
   },
-}
-
-export default config
+})

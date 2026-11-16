@@ -40,7 +40,7 @@
     "@types/node": "catalog:",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/supertest": "^7.2.1",
-    "supertest": "^7.3.1",
+    "supertest": "^7.3.2",
     "typescript": "catalog:",
     "vite-node": "^6.0.0",
     "vitest": "catalog:"
